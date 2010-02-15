@@ -13,10 +13,10 @@ class Scanner(object):
     def scan(self, package):
         """ Scan a Python package and any of its subpackages.  All
         top-level objects will be considered; those marked with
-        :term:`__venusian_callback__` decorations will be processed.
+        venusian callback attributes will be processed.
 
         The ``package`` argument should be a reference to a Python
-        :term:`package` or module object.
+        package or module object.
         """
         def invoke(name, ob):
             callbacks = getattr(ob, ATTACH_ATTR, None)
@@ -64,9 +64,11 @@ class AttachInfo(object):
         self.__dict__.update(kw)
 
 def attach(wrapped, callback, depth=1):
-    """ Attach a callback to the wrapped object to be found later
-    during a scan.  This function returns an instance of the
-    AttachInfo class."""
+
+    """ Attach a callback to the wrapped object.  It will be found
+    later during a scan.  This function returns an instance of the
+    :class:`venusian.AttachInfo` class."""
+
     frame = sys._getframe(depth+1)
     scope, module, f_locals, f_globals = getFrameInfo(frame)
     if scope == 'class':
