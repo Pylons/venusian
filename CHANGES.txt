@@ -1,0 +1,7 @@
+repoze.atemplate Changelog
+==========================
+
+0.0 (unreleased)
+----------------
+
+- Initial release.
