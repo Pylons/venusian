@@ -13,8 +13,8 @@ This library is most useful for framework authors.
    The name "Venusian" is a riff on a library named :term:`Martian`
    (which had its genesis in the :term:`Grok` web framework), from
    which the idea for Venusian was stolen.  Venusian is similar to
-   Martian,but it offers less functionality than :term:`Martian`,
-   making it slightly simpler to use.
+   Martian, but it offers less functionality, making it slightly
+   simpler to use.
 
 Overview
 --------
