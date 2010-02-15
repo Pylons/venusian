@@ -2,10 +2,11 @@ Venusian
 ========
 
 Venusian is a library which allows you to defer the action of
-decorators.  Instead of taking actions when a function (or class)
-decorator is executed at import time, you can defer the action until a
-separate "scan" phase. This library is most useful for framework
-authors.
+decorators.  Instead of taking actions when a function, method, or
+class decorator is executed at import time, you can defer the action
+until a separate "scan" phase.
+
+This library is most useful for framework authors.
 
 .. note::
 
@@ -28,7 +29,7 @@ modifications to behavior are "hidden" in the decorator code itself.
 
 For example, let's suppose your framework defines a decorator function
 named ``jsonify`` which can wrap a function that returns an arbitrary
-Python data structure and renders it to a :term:`json` serialization:
+Python data structure and renders it to a JSON serialization:
 
 .. code-block:: python
    :linenos:
@@ -339,14 +340,30 @@ Also note that the *original* function being decorated is never
 molested.  We really only get the opportunity to decorate it during
 the callback.
 
+Limitations and Audience
+------------------------
+
+Venusian is not really a tool that is maximally useful to an
+application developer.  It would be a little silly to use it every
+time you needed a decorator.  Instead, it's most useful for framework
+authors, in order to be able to say to their users "the frobozz
+decorator doesn't change the output of your function at all" in
+documentation.  This is a lot easier than telling them how to test
+methods/functions/classes decorated by each individual decorator
+offered by your frameworks.
+
+API Documentation / Glossary
+----------------------------
+
 .. toctree::
    :maxdepth: 2
 
    api.rst
+   glossary.rst
 
 Indices and tables
 ------------------
 
-* :ref:`genindex`
+* :ref:`glossary`
 * :ref:`modindex`
 * :ref:`search`
