@@ -50,7 +50,7 @@ uses it to decorate an application function:
 .. code-block:: python
    :linenos:
 
-    from yourframework import jsonify
+    from theframework import jsonify
 
     @jsonify
     def logged_in(request):
@@ -95,7 +95,7 @@ To do so, he might refactor his code to look like this:
 .. code-block:: python
    :linenos:
 
-    from yourframework import jsonify
+    from theframework import jsonify
 
     @jsonify
     def logged_in(request):
@@ -167,9 +167,9 @@ demonstrated below.
 
    import venusian
 
-   def thedecorator(wrapped):
+   def jsonify(wrapped):
        def callback(scanner, name, ob):
-           print 'scanned'
+           print 'jsonified'
        venusian.attach(wrapped, callback)
        return wrapped
 
@@ -182,22 +182,22 @@ Usage of the decorator:
 .. code-block:: python
    :linenos:
 
-   from theframework import thedecorator
+   from theframework import jsonify
 
-   @thedecorator
-   def func():
-       return 'hello'
+   @jsonify
+   def logged_in(request):
+       return {'result':'Logged in'}
 
 Note that when we import and use the function, the fact that it is
-decorated with the ``thedecorator`` decorator is immaterial.  Our
-decorator doesn't actually change its behavior.
+decorated with the ``jsonify`` decorator is immaterial.  Our decorator
+doesn't actually change its behavior.
 
 .. code-block:: python
    :linenos:
 
-   >>> from theapp import func
-   >>> func()
-   'hello'
+   >>> from theapp import logged_in
+   >>> logged_in()
+   {'result':'Logged in'}
    >>>
 
 This is the intended result.  During unit testing, the original
@@ -215,13 +215,13 @@ However, we can cause something to happen when we invoke a :term:`scan`.
    scanner = venusian.Scanner()
    scanner.scan(theapp)
 
-Above we've imported a module named ``theapp``. The ``func`` function
-which we decorated with our ``thedecorator`` decorator lives in this
-module.  We've also imported the :mod:`venusian` module, and we've
-created an instance of the :class:`venusian.Scanner` class.  Once
-we've created the instance of :class:`venusian.Scanner`, we invoke its
-:meth:`venusian.Scanner.scan` method, passing the ``theapp`` module as
-an argument to the method.
+Above we've imported a module named ``theapp``. The ``logged_in``
+function which we decorated with our ``jsonify`` decorator lives in
+this module.  We've also imported the :mod:`venusian` module, and
+we've created an instance of the :class:`venusian.Scanner` class.
+Once we've created the instance of :class:`venusian.Scanner`, we
+invoke its :meth:`venusian.Scanner.scan` method, passing the
+``theapp`` module as an argument to the method.
 
 Here's what happens as a result of invoking the
 :meth:`venusian.Scanner.scan` method:
@@ -238,15 +238,15 @@ instead of a module.  This would recursively import each module in the
 package (as well as any modules in subpackages), looking for
 callbacks.
 
-In our case, because the callback we defined within the
-``thedecorator`` decorator function prints ``scanned`` when it is
-invoked, it means that the word ``scanned`` will be printed to the
-console when we cause :meth:`venusian.Scanner.scan` to be invoked.
-How is this useful?  It's not!  At least not yet.  Let's create a more
-real-world example.
+In our case, because the callback we defined within the ``jsonify``
+decorator function prints ``jsonified`` when it is invoked, which
+means that the word ``jsonified`` will be printed to the console when
+we cause :meth:`venusian.Scanner.scan` to be invoked.  How is this
+useful?  It's not!  At least not yet.  Let's create a more realistic
+example.
 
-Let's change our ``thedecorator`` decorator to perform an arbitrary
-action when a scan is invoked by changing the body of its callback.
+Let's change our ``jsonify`` decorator to perform a more useful action
+when a scan is invoked by changing the body of its callback.
 
 .. code-block:: python
    :linenos:
@@ -255,7 +255,10 @@ action when a scan is invoked by changing the body of its callback.
 
    def thedecorator(wrapped):
        def callback(scanner, name, ob):
-           scanner.register(name, ob)
+           def jsonified(request):
+               result = wrapped(request)
+               return json.dumps(result)
+           scanner.registry.add(name, jsonified)
        venusian.attach(wrapped, callback)
        return wrapped
 
@@ -270,36 +273,12 @@ Now if we invoke a scan, we'll get an error:
    scanner = venusian.Scanner()
    scanner.scan(theapp)
 
-   AttributeError: Scanner has no attribute 'register'.
-
-Let's fix that by creating a ``register`` object that we'll pass to
-our scanner's constructor:
-
-.. code-block:: python
-   :linenos:
-
-   import venusian
-   import theapp
-
-   class Register(object):
-       def __init__(self):
-          self.registered = []
-
-       def __call__(self, name, ob):
-          self.registered.append((name, ob))
-
-   register = Register()
-   scanner = venusian.Scanner(register=register)
-   scanner.scan(theapp)
-
-At this point, we have a system which, during a scan, for each object
-that is wrapped with a Venusian-aware decorator, a registration will
-be made to an instance of our ``Register`` object.
+   AttributeError: Scanner has no attribute 'registry'.
 
 The :class:`venusian.Scanner` class constructor accepts any key-value
 pairs; for each key/value pair passed to the scanner's constructor, an
 attribute named after the key which points at the value is added to
-the scanner instance.  So if you do:
+the scanner instance.  So when you do:
 
 .. code-block:: python
    :linenos:
@@ -307,11 +286,42 @@ the scanner instance.  So if you do:
    import venusian
    scanner = venusian.Scanner(a=1)
 
-Thereafter, ``scanner.a`` will equal the integer 1.  Any number of
-key-value pairs can be passed to a scanner.  The purpose of being able
-to pass arbitrary key/value pairs to a scanner is to allow cooperating
-decorator callbacks to access these values: each callback is passed
-the ``scanner`` constructed when a scan is invoked.
+Thereafter, ``scanner.a`` will equal the integer 1.
+
+Any number of key-value pairs can be passed to a scanner.  The purpose
+of being able to pass arbitrary key/value pairs to a scanner is to
+allow cooperating decorator callbacks to access these values: each
+callback is passed the ``scanner`` constructed when a scan is invoked.
+
+Let's fix our example by creating an object named ``register`` that
+we'll pass to our scanner's constructor:
+
+.. code-block:: python
+   :linenos:
+
+   import venusian
+   import theapp
+
+   class Registry(object):
+       def __init__(self):
+          self.registered = []
+
+       def add(self, name, ob):
+          self.registered.append((name, ob))
+
+   register = Register()
+   scanner = venusian.Scanner(registry=registry)
+   scanner.scan(theapp)
+
+At this point, we have a system which, during a scan, for each object
+that is wrapped with a Venusian-aware decorator, a tuple will be
+appended to the ``registered`` attribute of a ``Registry`` object.
+The first element of the tuple will be the decorated object's name,
+the second element of the tuple will be a "truly" decorated object.
+In our case, this will be a jsonify-decorated callable.
+
+Our framework can then use the information in the registry to decide
+which view function to call when a request comes in.
 
 Venusian callbacks must accept three arguments:
 
@@ -336,9 +346,7 @@ system where a registry will be populated that informs some
 higher-level system (such as a web framework) about the available
 decorated functions.
 
-Also note that the *original* function being decorated is never
-molested.  We really only get the opportunity to decorate it during
-the callback.
+In our example above, the scan causes the
 
 Limitations and Audience
 ------------------------
