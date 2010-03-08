@@ -253,7 +253,7 @@ when a scan is invoked by changing the body of its callback.
 
    import venusian
 
-   def thedecorator(wrapped):
+   def jsonify(wrapped):
        def callback(scanner, name, ob):
            def jsonified(request):
                result = wrapped(request)
@@ -293,7 +293,7 @@ of being able to pass arbitrary key/value pairs to a scanner is to
 allow cooperating decorator callbacks to access these values: each
 callback is passed the ``scanner`` constructed when a scan is invoked.
 
-Let's fix our example by creating an object named ``register`` that
+Let's fix our example by creating an object named ``registry`` that
 we'll pass to our scanner's constructor:
 
 .. code-block:: python
@@ -345,8 +345,6 @@ can perform arbitrary actions together, you can probably imagine a
 system where a registry will be populated that informs some
 higher-level system (such as a web framework) about the available
 decorated functions.
-
-In our example above, the scan causes the
 
 Limitations and Audience
 ------------------------
