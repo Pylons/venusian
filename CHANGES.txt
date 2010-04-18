@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-Next release
-------------
+0.2 (2010-04-18)
+----------------
 
 - Add the concept of scan categories (see the "Scan Categories"
   section of the documentation) to allow an application to make use of
