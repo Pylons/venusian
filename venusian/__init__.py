@@ -10,17 +10,28 @@ class Scanner(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
-    def scan(self, package):
+    def scan(self, package, categories=None):
         """ Scan a Python package and any of its subpackages.  All
         top-level objects will be considered; those marked with
-        venusian callback attributes will be processed.
+        venusian callback attributes related to ``category`` will be
+        processed.
 
         The ``package`` argument should be a reference to a Python
         package or module object.
+
+        The ``categories`` argument should be sequence of Venusian
+        callback categories (each category usually a string) or the
+        special value ``None`` which means all Venusian callback
+        categories.  The default is ``None``.
         """
         def invoke(name, ob):
-            callbacks = getattr(ob, ATTACH_ATTR, None)
-            if callbacks is not None:
+            category_keys = categories
+            attached_categories = getattr(ob, ATTACH_ATTR, {})
+            if category_keys is None:
+                category_keys = attached_categories.keys()
+                category_keys.sort()
+            for category in category_keys:
+                callbacks = attached_categories.get(category, [])
                 for callback in callbacks:
                     callback(self, name, ob)
 
@@ -59,11 +70,17 @@ class AttachInfo(object):
     ``globals``
 
       A dictionary containing decorator frame's f_globals.
+
+    ``category``
+
+      The ``category`` argument passed to ``attach`` (or ``None``, the
+      default).
+      
     """
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
-def attach(wrapped, callback, depth=1):
+def attach(wrapped, callback, category=None, depth=1):
 
     """ Attach a callback to the wrapped object.  It will be found
     later during a scan.  This function returns an instance of the
@@ -73,14 +90,17 @@ def attach(wrapped, callback, depth=1):
     scope, module, f_locals, f_globals = getFrameInfo(frame)
     if scope == 'class':
         # we're in the midst of a class statement
-        callbacks = f_locals.setdefault(ATTACH_ATTR, [])
+        categories = f_locals.setdefault(ATTACH_ATTR, {})
+        callbacks = categories.setdefault(category, [])
         callbacks.append(callback)
     else:
-        callbacks = getattr(wrapped, ATTACH_ATTR, [])
+        categories = getattr(wrapped, ATTACH_ATTR, {})
+        callbacks = categories.setdefault(category, [])
         callbacks.append(callback)
-        setattr(wrapped, ATTACH_ATTR, callbacks)
+        setattr(wrapped, ATTACH_ATTR, categories)
     return AttachInfo(
-        scope=scope, module=module, locals=f_locals, globals=f_globals)
+        scope=scope, module=module, locals=f_locals, globals=f_globals,
+        category=category)
 
     
     

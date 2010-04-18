@@ -346,6 +346,50 @@ system where a registry will be populated that informs some
 higher-level system (such as a web framework) about the available
 decorated functions.
 
+Scan Categories
+---------------
+
+Because an application may use two separate Venusian-using frameworks,
+Venusian allows for the concept of "scan categories".
+
+The :func:`venusian.attach` function accepts an additional argument
+named ``category``.
+
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   import venusian
+
+   def jsonify(wrapped):
+       def callback(scanner, name, ob):
+           def jsonified(request):
+               result = wrapped(request)
+               return json.dumps(result)
+           scanner.registry.add(name, jsonified)
+       venusian.attach(wrapped, callback, category='myframework')
+       return wrapped
+
+Note the ``category='myframework'`` argument in the call to
+:func:`venusian.attach`.  This tells Venusian to attach the callback
+to the wrapped object under the specific scan category
+``myframework``.  The default scan category is ``None``.
+
+Later, during :meth:`venusian.Scanner.scan`, a user can choose to
+activate all the decorators associated only with a particular set of
+scan categories by passing a ``categories`` argument.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   import venusian
+   scanner = venusian.Scanner(a=1)
+   scanner.scan(theapp, categories=('myframework',))
+
+The default ``categories`` argument is ``None``, which means activate
+all Venusian callbacks during a scan regardless of their category.
+
 Limitations and Audience
 ------------------------
 

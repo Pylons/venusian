@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Next release
+------------
+
+- Add the concept of scan categories (see the "Scan Categories"
+  section of the documentation) to allow an application to make use of
+  more than one Venusian-using framework simultaneously.
+
 0.1 (2010-02-15)
 ----------------
 

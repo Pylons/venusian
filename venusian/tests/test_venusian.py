@@ -82,3 +82,53 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[2]['ob'], inst1)
         self.assertEqual(test.registrations[2]['instance'], True)
 
+    def test_one_category(self):
+        from venusian.tests import categoryfixture
+        class Test(object):
+            def __init__(self):
+                self.registrations = []
+            def __call__(self, **kw):
+                self.registrations.append(kw)
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(categoryfixture, categories=('mycategory',))
+        self.assertEqual(len(test.registrations), 1)
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], categoryfixture.function)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+    def test_all_categories_implicit(self):
+        from venusian.tests import categoryfixture
+        class Test(object):
+            def __init__(self):
+                self.registrations = []
+            def __call__(self, **kw):
+                self.registrations.append(kw)
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(categoryfixture)
+        self.assertEqual(len(test.registrations), 2)
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], categoryfixture.function)
+        self.assertEqual(test.registrations[0]['function'], True)
+        self.assertEqual(test.registrations[1]['name'], 'function2')
+        self.assertEqual(test.registrations[1]['ob'], categoryfixture.function2)
+        self.assertEqual(test.registrations[1]['function'], True)
+
+    def test_all_categories_explicit(self):
+        from venusian.tests import categoryfixture
+        class Test(object):
+            def __init__(self):
+                self.registrations = []
+            def __call__(self, **kw):
+                self.registrations.append(kw)
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(categoryfixture, categories=('mycategory', 'mycategory2'))
+        self.assertEqual(len(test.registrations), 2)
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], categoryfixture.function)
+        self.assertEqual(test.registrations[0]['function'], True)
+        self.assertEqual(test.registrations[1]['name'], 'function2')
+        self.assertEqual(test.registrations[1]['ob'], categoryfixture.function2)
+        self.assertEqual(test.registrations[1]['function'], True)
