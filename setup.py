@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.2'
+__version__ = '0.3'
 
 import os
 
@@ -35,7 +35,7 @@ setup(name='venusian',
         "Programming Language :: Python",
         ],
       keywords='web wsgi zope',
-      author="Agendaless Consulting",
+      author="Chris McDonough, Agendaless Consulting",
       author_email="repoze-dev@lists.repoze.org",
       url="http://www.repoze.org",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
