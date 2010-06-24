@@ -62,9 +62,9 @@ class TestScanner(unittest.TestCase):
             def __call__(self, **kw):
                 self.registrations.append(kw)
         test = Test()
-        scanner = self._makeOne(test=test)
+        scanner = self._makeOne(test=test) 
         scanner.scan(pycfixtures)
-        self.assertEqual(len(test.registrations), 3)
+        self.assertEqual(len(test.registrations), 4)
         test.registrations.sort(
             lambda x, y: cmp((x['name'], x['ob'].__module__),
                              (y['name'], y['ob'].__module__))
@@ -72,6 +72,7 @@ class TestScanner(unittest.TestCase):
         from venusian.tests.pycfixtures.module import function as func1
         from venusian.tests.pycfixtures.module import inst as inst1
         from venusian.tests.pycfixtures.module import Class as Class1
+        from venusian.tests.pycfixtures import subpackage
 
         self.assertEqual(test.registrations[0]['name'], 'Class')
         self.assertEqual(test.registrations[0]['ob'], Class1)
@@ -84,6 +85,10 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[2]['name'], 'inst')
         self.assertEqual(test.registrations[2]['ob'], inst1)
         self.assertEqual(test.registrations[2]['instance'], True)
+
+        self.assertEqual(test.registrations[3]['name'], 'pkgfunction')
+        self.assertEqual(test.registrations[3]['ob'], subpackage.pkgfunction)
+        self.assertEqual(test.registrations[3]['function'], True)
 
     def test_module(self):
         from venusian.tests.fixtures import module
