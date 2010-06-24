@@ -1,3 +1,4 @@
+import imp
 import inspect
 import sys
 
@@ -42,10 +43,11 @@ class Scanner(object):
             results = walk_packages(package.__path__, package.__name__+'.')
 
             for importer, modname, ispkg in results:
-                __import__(modname)
-                module = sys.modules[modname]
-                for name, ob in inspect.getmembers(module, None):
-                    invoke(name, ob)
+                loader = importer.find_module(modname)
+                if loader.etc[2] == imp.PY_SOURCE:
+                    module = loader.load_module(loader.fullname)
+                    for name, ob in inspect.getmembers(module, None):
+                        invoke(name, ob)
 
 class AttachInfo(object):
     """

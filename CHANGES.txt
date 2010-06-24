@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Next release
+------------
+
+- Ignore "orphaned" modules (.pyc or .pyo files without a
+  corresponding .py file).
+
 0.2 (2010-04-18)
 ----------------
 
