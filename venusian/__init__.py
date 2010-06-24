@@ -45,8 +45,13 @@ class Scanner(object):
             for importer, modname, ispkg in results:
                 loader = importer.find_module(modname)
                 # only non-orphaned source files and packages
-                if loader.etc[2] in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
-                    module = loader.load_module(loader.fullname)
+                module_type = loader.etc[2]
+                if module_type in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
+                    # NB: use __import__(modname) rather than
+                    # loader.load_module(modname) to prevent
+                    # inappropriate double-execution of module code
+                    __import__(modname)
+                    module = sys.modules[modname]
                     for name, ob in inspect.getmembers(module, None):
                         invoke(name, ob)
 
