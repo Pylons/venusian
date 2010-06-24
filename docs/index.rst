@@ -238,6 +238,10 @@ instead of a module.  This would recursively import each module in the
 package (as well as any modules in subpackages), looking for
 callbacks.
 
+.. note:: During scan, the only Python files that are processed are
+   Python *source* (``.py``) files.  Compiled Python files (``.pyc``,
+   ``.pyo`` files) without a corresponding source file are ignored.
+
 In our case, because the callback we defined within the ``jsonify``
 decorator function prints ``jsonified`` when it is invoked, which
 means that the word ``jsonified`` will be printed to the console when
