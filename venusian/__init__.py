@@ -44,8 +44,9 @@ class Scanner(object):
 
             for importer, modname, ispkg in results:
                 loader = importer.find_module(modname)
-                # only non-orphaned source files and packages
                 module_type = loader.etc[2]
+                # only scrape members from non-orphaned source files
+                # and package directories
                 if module_type in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
                     # NB: use __import__(modname) rather than
                     # loader.load_module(modname) to prevent
