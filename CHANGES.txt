@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Next release
+------------
+
+- Arrange test fixtures into a single directory.
+
 0.3 (2010-06-24)
 ----------------
 
