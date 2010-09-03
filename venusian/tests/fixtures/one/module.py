@@ -1,4 +1,4 @@
-from venusian.tests.fixtures import decorator
+from venusian.tests.fixtures.one import decorator
 
 @decorator(function=True)
 def function(request): # pragma: no cover

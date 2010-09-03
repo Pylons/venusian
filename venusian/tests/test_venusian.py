@@ -6,7 +6,7 @@ class TestScanner(unittest.TestCase):
         return Scanner(**kw)
 
     def test_package(self):
-        from venusian.tests import fixtures
+        from venusian.tests.fixtures import one
         class Test(object):
             def __init__(self):
                 self.registrations = []
@@ -14,18 +14,18 @@ class TestScanner(unittest.TestCase):
                 self.registrations.append(kw)
         test = Test()
         scanner = self._makeOne(test=test)
-        scanner.scan(fixtures)
+        scanner.scan(one)
         self.assertEqual(len(test.registrations), 6)
         test.registrations.sort(
             lambda x, y: cmp((x['name'], x['ob'].__module__),
                              (y['name'], y['ob'].__module__))
             )
-        from venusian.tests.fixtures.module import function as func1
-        from venusian.tests.fixtures.module2 import function as func2
-        from venusian.tests.fixtures.module import inst as inst1
-        from venusian.tests.fixtures.module2 import inst as inst2
-        from venusian.tests.fixtures.module import Class as Class1
-        from venusian.tests.fixtures.module2 import Class as Class2
+        from venusian.tests.fixtures.one.module import function as func1
+        from venusian.tests.fixtures.one.module2 import function as func2
+        from venusian.tests.fixtures.one.module import inst as inst1
+        from venusian.tests.fixtures.one.module2 import inst as inst2
+        from venusian.tests.fixtures.one.module import Class as Class1
+        from venusian.tests.fixtures.one.module2 import Class as Class2
 
         self.assertEqual(test.registrations[0]['name'], 'Class')
         self.assertEqual(test.registrations[0]['ob'], Class1)
@@ -55,7 +55,7 @@ class TestScanner(unittest.TestCase):
         # There is a module2.pyc file in the "pycfixtures" package; it
         # has no corresponding .py source file.  Such orphaned .pyc
         # files should be ignored during scanning.
-        from venusian.tests import pycfixtures
+        from venusian.tests.fixtures import pyc
         class Test(object):
             def __init__(self):
                 self.registrations = []
@@ -63,16 +63,16 @@ class TestScanner(unittest.TestCase):
                 self.registrations.append(kw)
         test = Test()
         scanner = self._makeOne(test=test) 
-        scanner.scan(pycfixtures)
+        scanner.scan(pyc)
         self.assertEqual(len(test.registrations), 4)
         test.registrations.sort(
             lambda x, y: cmp((x['name'], x['ob'].__module__),
                              (y['name'], y['ob'].__module__))
             )
-        from venusian.tests.pycfixtures.module import function as func1
-        from venusian.tests.pycfixtures.module import inst as inst1
-        from venusian.tests.pycfixtures.module import Class as Class1
-        from venusian.tests.pycfixtures import subpackage
+        from venusian.tests.fixtures.pyc.module import function as func1
+        from venusian.tests.fixtures.pyc.module import inst as inst1
+        from venusian.tests.fixtures.pyc.module import Class as Class1
+        from venusian.tests.fixtures.pyc import subpackage
 
         self.assertEqual(test.registrations[0]['name'], 'Class')
         self.assertEqual(test.registrations[0]['ob'], Class1)
@@ -91,7 +91,7 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[3]['function'], True)
 
     def test_module(self):
-        from venusian.tests.fixtures import module
+        from venusian.tests.fixtures.one import module
         class Test(object):
             def __init__(self):
                 self.registrations = []
@@ -105,9 +105,9 @@ class TestScanner(unittest.TestCase):
             lambda x, y: cmp((x['name'], x['ob'].__module__),
                              (y['name'], y['ob'].__module__))
             )
-        from venusian.tests.fixtures.module import function as func1
-        from venusian.tests.fixtures.module import inst as inst1
-        from venusian.tests.fixtures.module import Class as Class1
+        from venusian.tests.fixtures.one.module import function as func1
+        from venusian.tests.fixtures.one.module import inst as inst1
+        from venusian.tests.fixtures.one.module import Class as Class1
 
         self.assertEqual(test.registrations[0]['name'], 'Class')
         self.assertEqual(test.registrations[0]['ob'], Class1)
@@ -122,7 +122,7 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[2]['instance'], True)
 
     def test_one_category(self):
-        from venusian.tests import categoryfixture
+        from venusian.tests.fixtures import category
         class Test(object):
             def __init__(self):
                 self.registrations = []
@@ -130,14 +130,14 @@ class TestScanner(unittest.TestCase):
                 self.registrations.append(kw)
         test = Test()
         scanner = self._makeOne(test=test)
-        scanner.scan(categoryfixture, categories=('mycategory',))
+        scanner.scan(category, categories=('mycategory',))
         self.assertEqual(len(test.registrations), 1)
         self.assertEqual(test.registrations[0]['name'], 'function')
-        self.assertEqual(test.registrations[0]['ob'], categoryfixture.function)
+        self.assertEqual(test.registrations[0]['ob'], category.function)
         self.assertEqual(test.registrations[0]['function'], True)
 
     def test_all_categories_implicit(self):
-        from venusian.tests import categoryfixture
+        from venusian.tests.fixtures import category
         class Test(object):
             def __init__(self):
                 self.registrations = []
@@ -145,17 +145,17 @@ class TestScanner(unittest.TestCase):
                 self.registrations.append(kw)
         test = Test()
         scanner = self._makeOne(test=test)
-        scanner.scan(categoryfixture)
+        scanner.scan(category)
         self.assertEqual(len(test.registrations), 2)
         self.assertEqual(test.registrations[0]['name'], 'function')
-        self.assertEqual(test.registrations[0]['ob'], categoryfixture.function)
+        self.assertEqual(test.registrations[0]['ob'], category.function)
         self.assertEqual(test.registrations[0]['function'], True)
         self.assertEqual(test.registrations[1]['name'], 'function2')
-        self.assertEqual(test.registrations[1]['ob'], categoryfixture.function2)
+        self.assertEqual(test.registrations[1]['ob'], category.function2)
         self.assertEqual(test.registrations[1]['function'], True)
 
     def test_all_categories_explicit(self):
-        from venusian.tests import categoryfixture
+        from venusian.tests.fixtures import category
         class Test(object):
             def __init__(self):
                 self.registrations = []
@@ -163,11 +163,11 @@ class TestScanner(unittest.TestCase):
                 self.registrations.append(kw)
         test = Test()
         scanner = self._makeOne(test=test)
-        scanner.scan(categoryfixture, categories=('mycategory', 'mycategory2'))
+        scanner.scan(category, categories=('mycategory', 'mycategory2'))
         self.assertEqual(len(test.registrations), 2)
         self.assertEqual(test.registrations[0]['name'], 'function')
-        self.assertEqual(test.registrations[0]['ob'], categoryfixture.function)
+        self.assertEqual(test.registrations[0]['ob'], category.function)
         self.assertEqual(test.registrations[0]['function'], True)
         self.assertEqual(test.registrations[1]['name'], 'function2')
-        self.assertEqual(test.registrations[1]['ob'], categoryfixture.function2)
+        self.assertEqual(test.registrations[1]['ob'], category.function2)
         self.assertEqual(test.registrations[1]['function'], True)
