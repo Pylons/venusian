@@ -43,8 +43,12 @@ setup(name='venusian',
       include_package_data=True,
       zip_safe=False,
       tests_require = requires,
+      setup_requires = 'nose',
       install_requires = requires,
-      test_suite="venusian",
+      # Normal unittest can't support running the venusian tests under
+      # py 2.4 or 2.5; when it scans the 'classdecorators' fixture, it
+      # barfs.  We use nose.collector as a workaround.
+      test_suite="nose.collector", 
       entry_points = """\
       """
       )
