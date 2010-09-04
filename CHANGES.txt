@@ -1,15 +1,16 @@
 Change Log
 ==========
 
-Next release
-------------
+0.4 (2010-09-03)
+----------------
 
 - Bug fix: when a venusian decorator used as a class decorator was
   used against both a class *and* a subclass of that class, the
   superclass and subclass would effectively share the same set of
   callbacks.  This was not the intent: each class declaration should
   have its own local set of callbacks; callbacks added via decorations
-  should not be inherited.
+  should not be inherited, and a superclass should not receive its
+  subclass' decorations.
 
 - Arrange test fixtures into a single directory.
 
