@@ -103,7 +103,11 @@ def attach(wrapped, callback, category=None, depth=1):
         callbacks = categories.setdefault(category, [])
         callbacks.append(callback)
     else:
-        categories = getattr(wrapped, ATTACH_ATTR, {})
+        if inspect.isclass(wrapped):
+            # ignore any superclass attachments, these should not be inherited
+            categories = wrapped.__dict__.get(ATTACH_ATTR, {})
+        else:
+            categories = getattr(wrapped, ATTACH_ATTR, {})
         callbacks = categories.setdefault(category, [])
         callbacks.append(callback)
         setattr(wrapped, ATTACH_ATTR, categories)
