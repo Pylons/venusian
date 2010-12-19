@@ -55,32 +55,39 @@ class FrameInfoTest(unittest.TestCase):
     classLevelFrameInfo = advice.getFrameInfo(sys._getframe())
 
     def testModuleInfo(self):
-        kind, module, f_locals, f_globals = moduleLevelFrameInfo
+        kind, module, f_locals, f_globals, codeinfo = moduleLevelFrameInfo
         self.assertEquals(kind, "module")
         for d in module.__dict__, f_locals, f_globals:
             self.assert_(d is globals())
+        self.assertEqual(len(codeinfo), 4)
 
     def testClassicClassInfo(self):
-        kind, module, f_locals, f_globals = ClassicClass.classLevelFrameInfo
+        (kind, module, f_locals, f_globals,
+         codeinfo) = ClassicClass.classLevelFrameInfo
         self.assertEquals(kind, "class")
 
         self.assert_(f_locals is ClassicClass.__dict__)  # ???
         for d in module.__dict__, f_globals:
             self.assert_(d is globals())
+        self.assertEqual(len(codeinfo), 4)
 
     def testNewStyleClassInfo(self):
-        kind, module, f_locals, f_globals = NewStyleClass.classLevelFrameInfo
+        (kind, module, f_locals,
+         f_globals, codeinfo) = NewStyleClass.classLevelFrameInfo
         self.assertEquals(kind, "class")
 
         for d in module.__dict__, f_globals:
             self.assert_(d is globals())
+        self.assertEqual(len(codeinfo), 4)
 
     def testCallInfo(self):
-        kind, module, f_locals, f_globals = advice.getFrameInfo(sys._getframe())
+        (kind, module, f_locals, f_globals,
+         codeinfo) = advice.getFrameInfo(sys._getframe())
         self.assertEquals(kind, "function call")
         self.assert_(f_locals is locals()) # ???
         for d in module.__dict__, f_globals:
             self.assert_(d is globals())
+        self.assertEqual(len(codeinfo), 4)
 
 
 class AdviceTests(unittest.TestCase):

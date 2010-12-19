@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+Next release
+----------------
+
+- Make ``codeinfo`` attribute available as an attribute of the AttachInfo
+  object. It will be a tuple in the form ``(filename, lineno, function,
+  sourceline)`` representing the context of the venusian decorator.  Eg.
+  ``('/home/chrism/projects/venusian/tests/test_advice.py', 81,
+  'testCallInfo', 'add_handler(foo, bar)')``
+
 0.4 (2010-09-03)
 ----------------
 

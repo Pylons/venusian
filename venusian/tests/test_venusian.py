@@ -145,7 +145,7 @@ class TestScanner(unittest.TestCase):
 
     if sys.version_info >= (2, 6):
 
-        def test_classdecorator(self):
+        def test_classdecorator(self): # pragma: no cover
             from venusian.tests.fixtures import classdecorator
             test = Test()
             scanner = self._makeOne(test=test)

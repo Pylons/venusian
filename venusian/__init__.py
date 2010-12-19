@@ -84,19 +84,25 @@ class AttachInfo(object):
 
       The ``category`` argument passed to ``attach`` (or ``None``, the
       default).
+
+    ``codeinfo``
+
+      A tuple in the form ``(filename, lineno, function, sourceline)``
+      representing the context of the venusian decorator used.  Eg.
+      ``('/home/chrism/projects/venusian/tests/test_advice.py', 81,
+      'testCallInfo', 'add_handler(foo, bar)')``
       
     """
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
 def attach(wrapped, callback, category=None, depth=1):
-
     """ Attach a callback to the wrapped object.  It will be found
     later during a scan.  This function returns an instance of the
     :class:`venusian.AttachInfo` class."""
 
     frame = sys._getframe(depth+1)
-    scope, module, f_locals, f_globals = getFrameInfo(frame)
+    scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
     if scope == 'class':
         # we're in the midst of a class statement
         categories = f_locals.setdefault(ATTACH_ATTR, {})
@@ -113,7 +119,7 @@ def attach(wrapped, callback, category=None, depth=1):
         setattr(wrapped, ATTACH_ATTR, categories)
     return AttachInfo(
         scope=scope, module=module, locals=f_locals, globals=f_globals,
-        category=category)
+        category=category, codeinfo=codeinfo)
 
     
     

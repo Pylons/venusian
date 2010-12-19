@@ -27,6 +27,7 @@ Visit the PEAK home page at http://peak.telecommunity.com for more information.
 $Id: advice.py 25177 2004-06-02 13:17:31Z jim $
 """
 
+import inspect
 from types import ClassType, FunctionType
 import sys
 
@@ -50,6 +51,14 @@ def getFrameInfo(frame):
 
     namespaceIsModule = module and module.__dict__ is f_globals
 
+    frameinfo = inspect.getframeinfo(frame)
+    try:
+        sourceline = frameinfo[3][0].strip()
+    except:
+        sourceline = frameinfo[3]
+
+    codeinfo = frameinfo[0], frameinfo[1], frameinfo[2], sourceline
+
     if not namespaceIsModule:
         # some kind of funky exec
         kind = "exec"
@@ -63,7 +72,7 @@ def getFrameInfo(frame):
         # How can you have f_locals is f_globals, and have '__module__' set?
         # This is probably module-level code, but with a '__module__' variable.
         kind = "unknown"
-    return kind, module, f_locals, f_globals
+    return kind, module, f_locals, f_globals, codeinfo
 
 
 def addClassAdvisor(callback, depth=2):
@@ -91,7 +100,7 @@ def addClassAdvisor(callback, depth=2):
     declare any '__metaclass__' *first*, to ensure all callbacks are run."""
 
     frame = sys._getframe(depth)
-    kind, module, caller_locals, caller_globals = getFrameInfo(frame)
+    kind, module, caller_locals, caller_globals, codeinfo = getFrameInfo(frame)
 
     # This causes a problem when zope interfaces are used from doctest.
     # In these cases, kind == "exec".
