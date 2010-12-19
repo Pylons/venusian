@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-Next release
+0.5 (2010-12-19)
 ----------------
 
 - Make ``codeinfo`` attribute available as an attribute of the AttachInfo
