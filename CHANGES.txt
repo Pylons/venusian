@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+Next release
+------------
+
+- Some metaclasses (Elixir's) don't raise an AttributeError when asked for a
+  nonexistent attribute during a scan.  We now catch all exceptions when
+  interrogating an object for ``__venusian_callbacks__`` rather than just
+  AttributeError.
+
 0.5 (2010-12-19)
 ----------------
 

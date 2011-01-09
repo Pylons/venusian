@@ -7,6 +7,14 @@ from venusian.advice import getFrameInfo
 
 ATTACH_ATTR = '__venusian_callbacks__'
 
+def safe_getattr(ob, attr, default=None):
+    try:
+        return getattr(ob, attr)
+    except:
+        # some metaclasses do insane things when asked for an attribute (like
+        # not raising an AttributeError
+        return default
+
 class Scanner(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
@@ -27,7 +35,7 @@ class Scanner(object):
         """
         def invoke(name, ob):
             category_keys = categories
-            attached_categories = getattr(ob, ATTACH_ATTR, {})
+            attached_categories = safe_getattr(ob, ATTACH_ATTR, {})
             if category_keys is None:
                 category_keys = attached_categories.keys()
                 category_keys.sort()
@@ -120,6 +128,3 @@ def attach(wrapped, callback, category=None, depth=1):
     return AttachInfo(
         scope=scope, module=module, locals=f_locals, globals=f_globals,
         category=category, codeinfo=codeinfo)
-
-    
-    
