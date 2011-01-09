@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-Next release
-------------
+0.6 (2011-01-09)
+----------------
 
 - Some metaclasses (Elixir's) don't raise an AttributeError when asked for a
   nonexistent attribute during a scan.  We now catch all exceptions when
