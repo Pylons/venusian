@@ -44,7 +44,7 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'venusian'
-copyright = '2009, Repoze Developers <repoze-dev@lists.repoze.org>'
+copyright = '2011 Pylons Project <pylons-discuss@googlegroups.com>'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -88,11 +88,17 @@ pygments_style = 'sphinx'
 
 # Options for HTML output
 # -----------------------
+# Add and use Pylons theme
+
+sys.path.append(os.path.abspath('_themes'))
+html_theme_path = ['_themes']
+html_theme = 'pylons'
+
 
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
-html_style = 'repoze.css'
+#html_style = 'pyramid.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -115,7 +121,7 @@ html_logo = '.static/logo_hi.gif'
 # here, relative to this directory. They are copied after the builtin
 # static files, so a file named "default.css" will overwrite the builtin
 # "default.css".
-html_static_path = ['.static']
+#html_static_path = ['.static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page
 # bottom, using the given strftime format.
@@ -171,7 +177,7 @@ htmlhelp_basename = 'atemplatedoc'
 #  author, document class [howto/manual]).
 latex_documents = [
   ('index', 'atemplate.tex', 'venusian Documentation',
-   'Repoze Developers', 'manual'),
+   'Pylons Project', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the
