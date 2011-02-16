@@ -6,6 +6,8 @@ Next release
 
 - Use Pylons theme in documentation.
 
+- Fix orphaned pyc test on pypy.
+
 0.6 (2011-01-09)
 ----------------
 
