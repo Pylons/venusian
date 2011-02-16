@@ -18,3 +18,4 @@ jyenv/
 pypyenv/
 build/
 dist/
+venusian/coverage.xml
