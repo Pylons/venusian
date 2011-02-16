@@ -52,17 +52,18 @@ class Scanner(object):
 
             for importer, modname, ispkg in results:
                 loader = importer.find_module(modname)
-                module_type = loader.etc[2]
-                # only scrape members from non-orphaned source files
-                # and package directories
-                if module_type in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
-                    # NB: use __import__(modname) rather than
-                    # loader.load_module(modname) to prevent
-                    # inappropriate double-execution of module code
-                    __import__(modname)
-                    module = sys.modules[modname]
-                    for name, ob in inspect.getmembers(module, None):
-                        invoke(name, ob)
+                if loader is not None: # happens on pypy with orphaned pyc
+                    module_type = loader.etc[2]
+                    # only scrape members from non-orphaned source files
+                    # and package directories
+                    if module_type in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
+                        # NB: use __import__(modname) rather than
+                        # loader.load_module(modname) to prevent
+                        # inappropriate double-execution of module code
+                        __import__(modname)
+                        module = sys.modules[modname]
+                        for name, ob in inspect.getmembers(module, None):
+                            invoke(name, ob)
 
 class AttachInfo(object):
     """
