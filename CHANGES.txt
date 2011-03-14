@@ -8,6 +8,10 @@ Next release
 
 - Fix orphaned pyc test on pypy.
 
+- Fix GitHub Issue #1: subclasses of decorated classes that do not
+  have any decorations should not inherit the decorations of their
+  parent classes. 
+
 0.6 (2011-01-09)
 ----------------
 

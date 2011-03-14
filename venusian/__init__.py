@@ -7,14 +7,6 @@ from venusian.advice import getFrameInfo
 
 ATTACH_ATTR = '__venusian_callbacks__'
 
-def safe_getattr(ob, attr, default=None):
-    try:
-        return getattr(ob, attr)
-    except:
-        # some metaclasses do insane things when asked for an attribute (like
-        # not raising an AttributeError
-        return default
-
 class Scanner(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
@@ -35,7 +27,14 @@ class Scanner(object):
         """
         def invoke(name, ob):
             category_keys = categories
-            attached_categories = safe_getattr(ob, ATTACH_ATTR, {})
+            try:
+                attached_categories = getattr(ob, ATTACH_ATTR)
+            except:
+                # some metaclasses do insane things when asked for an attribute (like
+                # not raising an AttributeError
+                return
+            if not attached_categories.attached_to(ob):
+                return
             if category_keys is None:
                 category_keys = attached_categories.keys()
                 category_keys.sort()
@@ -105,6 +104,17 @@ class AttachInfo(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
+class Categories(dict):
+
+    def __init__(self,attached_to=None):
+        super(dict,self).__init__()
+        self.attached_id = id(attached_to) if attached_to else None
+
+    def attached_to(self,obj):
+        if self.attached_id:
+            return self.attached_id==id(obj)
+        return True
+    
 def attach(wrapped, callback, category=None, depth=1):
     """ Attach a callback to the wrapped object.  It will be found
     later during a scan.  This function returns an instance of the
@@ -114,18 +124,18 @@ def attach(wrapped, callback, category=None, depth=1):
     scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
     if scope == 'class':
         # we're in the midst of a class statement
-        categories = f_locals.setdefault(ATTACH_ATTR, {})
+        categories = f_locals.setdefault(ATTACH_ATTR, Categories(None))
         callbacks = categories.setdefault(category, [])
         callbacks.append(callback)
     else:
-        if inspect.isclass(wrapped):
-            # ignore any superclass attachments, these should not be inherited
-            categories = wrapped.__dict__.get(ATTACH_ATTR, {})
-        else:
-            categories = getattr(wrapped, ATTACH_ATTR, {})
+        categories = getattr(wrapped, ATTACH_ATTR, None)
+        if categories is None or not categories.attached_to(wrapped):
+            # if there aren't any attached categories, or we've retrieved
+            # some by inheritance, we need to create new ones
+            categories = Categories(wrapped)
+            setattr(wrapped, ATTACH_ATTR, categories)
         callbacks = categories.setdefault(category, [])
         callbacks.append(callback)
-        setattr(wrapped, ATTACH_ATTR, categories)
     return AttachInfo(
         scope=scope, module=module, locals=f_locals, globals=f_globals,
         category=category, codeinfo=codeinfo)
