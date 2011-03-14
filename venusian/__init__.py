@@ -108,7 +108,10 @@ class Categories(dict):
 
     def __init__(self,attached_to=None):
         super(dict,self).__init__()
-        self.attached_id = id(attached_to) if attached_to else None
+        if attached_to is None:
+            self.attached_id = None
+        else:
+            self.attached_id = id(attached_to)
 
     def attached_to(self,obj):
         if self.attached_id:
