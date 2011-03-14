@@ -12,6 +12,9 @@ Next release
   have any decorations should not inherit the decorations of their
   parent classes. 
 
+- Fix GitHub Issue #2: scans should only "find" each object once per
+  scan, regardless of how many modules that object is imported into.
+
 0.6 (2011-01-09)
 ----------------
 

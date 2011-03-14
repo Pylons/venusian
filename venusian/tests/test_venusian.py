@@ -180,3 +180,15 @@ class TestScanner(unittest.TestCase):
             self.assertEqual(test.registrations[1]['ob'],
                              classdecorator.SuperClass)
             self.assertEqual(test.registrations[1]['superclass'], True)
+
+        def test_scan_only_finds_classdecoration_once(self):
+            from venusian.tests.fixtures import two
+            from venusian.tests.fixtures.two.mod1 import Class
+            test = Test()
+            scanner = self._makeOne(test=test)
+            scanner.scan(two)
+            self.assertEqual(test.registrations, [
+                dict(name='Class',
+                     ob=Class),
+                ])
+            

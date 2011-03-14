@@ -25,7 +25,13 @@ class Scanner(object):
         special value ``None`` which means all Venusian callback
         categories.  The default is ``None``.
         """
+        seen = set()
         def invoke(name, ob):
+            # in one scan, we only process each object once
+            if id(ob) in seen:
+                return
+            seen.add(id(ob))
+            
             category_keys = categories
             try:
                 attached_categories = getattr(ob, ATTACH_ATTR)
