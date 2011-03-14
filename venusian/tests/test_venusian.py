@@ -1,6 +1,13 @@
 import unittest
 import sys
 
+
+class Test(object):
+    def __init__(self):
+        self.registrations = []
+    def __call__(self, **kw):
+        self.registrations.append(kw)
+
 class TestScanner(unittest.TestCase):
     def _makeOne(self, **kw):
         from venusian import Scanner
@@ -163,9 +170,3 @@ class TestScanner(unittest.TestCase):
             self.assertEqual(test.registrations[1]['ob'],
                              classdecorator.SuperClass)
             self.assertEqual(test.registrations[1]['superclass'], True)
-
-class Test(object):
-    def __init__(self):
-        self.registrations = []
-    def __call__(self, **kw):
-        self.registrations.append(kw)
