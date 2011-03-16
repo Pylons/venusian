@@ -36,8 +36,8 @@ class Scanner(object):
             try:
                 attached_categories = getattr(ob, ATTACH_ATTR)
             except:
-                # some metaclasses do insane things when asked for an attribute (like
-                # not raising an AttributeError
+                # some metaclasses do insane things when asked for an attribute
+                # (like not raising an AttributeError)
                 return
             if not attached_categories.attached_to(ob):
                 return
@@ -111,17 +111,16 @@ class AttachInfo(object):
         self.__dict__.update(kw)
 
 class Categories(dict):
-
-    def __init__(self,attached_to=None):
-        super(dict,self).__init__()
+    def __init__(self, attached_to):
+        super(dict, self).__init__()
         if attached_to is None:
             self.attached_id = None
         else:
             self.attached_id = id(attached_to)
 
-    def attached_to(self,obj):
+    def attached_to(self, obj):
         if self.attached_id:
-            return self.attached_id==id(obj)
+            return self.attached_id == id(obj)
         return True
     
 def attach(wrapped, callback, category=None, depth=1):
