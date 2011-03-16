@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-Next release
-------------
+0.7 (2011-03-16)
+----------------
 
 - Use Pylons theme in documentation.
 
