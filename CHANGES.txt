@@ -1,6 +1,19 @@
 Change Log
 ==========
 
+0.8 (2011-04-30)
+----------------
+
+- Normal "setup.py test" can't support running the venusian tests under py
+  2.4 or 2.5; when it scans the 'classdecorators' fixture, it barfs.  To get
+  around this, we used to depend on ``nose`` in ``setup_requires`` and tell
+  "setup.py test" to use nose by setting test_suite to "nose.collector" but
+  we can't anymore because folks use Venusian in systems which install from
+  pip bundles; pip bundles do not support setup_requires.  So, sorry, we're
+  painted into a corner; at this point you just have to know to install nose
+  and run "setup.py nosetests" rather than "setup.py test".  Or just run
+  "tox" which tests it under all Pythons.
+
 0.7 (2011-03-16)
 ----------------
 

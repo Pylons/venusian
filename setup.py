@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.7'
+__version__ = '0.8'
 
 import os
 
@@ -48,12 +48,14 @@ setup(name='venusian',
       include_package_data=True,
       zip_safe=False,
       tests_require = requires,
-      setup_requires = 'nose',
       install_requires = requires,
-      # Normal unittest can't support running the venusian tests under
+      # Normal "setup.py test" can't support running the venusian tests under
       # py 2.4 or 2.5; when it scans the 'classdecorators' fixture, it
-      # barfs.  We use nose.collector as a workaround.
-      test_suite="nose.collector", 
+      # barfs.  We can't depend on nose in setup_requires here because folks use
+      # this under "pip bundle" which does not support setup_requires.
+      # So you just have to know to install nose and run "setup.py nosetests"
+      # rather than setup.py test.
+      test_suite='venusian',
       entry_points = """\
       """
       )
