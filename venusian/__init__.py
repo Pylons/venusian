@@ -37,12 +37,16 @@ class Scanner(object):
                 # Some metaclasses do insane things when asked for an
                 # attribute (like not raising an AttributeError).  Some even
                 # shittier introspected code lets us get this far but barfs
-                # on a second attribute access for ``attached_to``.  Finally,
-                # the shittiest code allows the attribute access of
-                # ``attached_to``, (say, ``__getattr__`` returning a proxy
-                # for any attribute access, I'm looking at you PyMongo),
-                # which either a) isn't callable or b) is callable, but, when
-                # called, shits its pants in an arbitrary way.
+                # on a second attribute access for ``attached_to`` (still not
+                # raising an AttributeError, but some other arbitrary
+                # exception).  Finally, the shittiest code of all allows the
+                # attribute access of the ATTACH_ATTR *and* ``attached_to``,
+                # (say, both ob.__getattr__ and
+                # ``attached_categories.__getattr__`` returning a proxy for
+                # any attribute access), which either a) isn't callable or b)
+                # is callable, but, when called, shits its pants in an
+                # potentially arbitrary way (although for b, only TypeError
+                # has been seen in the wild, from PyMongo).
                 attached_categories = getattr(ob, ATTACH_ATTR)
                 if not attached_categories.attached_to(ob):
                     return
