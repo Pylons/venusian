@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Next release
+------------
+
+- Prevent corner case scan-time exception when trying to introspect insane
+  module-scope objects.  See https://github.com/Pylons/venusian/issues/5 .
+
 0.8 (2011-04-30)
 ----------------
 

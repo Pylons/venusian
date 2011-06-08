@@ -34,12 +34,19 @@ class Scanner(object):
             
             category_keys = categories
             try:
+                # Some metaclasses do insane things when asked for an
+                # attribute (like not raising an AttributeError).  Some even
+                # shittier introspected code lets us get this far but barfs
+                # on a second attribute access for ``attached_to``.  Finally,
+                # the shittiest code allows the attribute access of
+                # ``attached_to``, (say, ``__getattr__`` returning a proxy
+                # for any attribute access, I'm looking at you PyMongo),
+                # which either a) isn't callable or b) is callable, but, when
+                # called, shits its pants in an arbitrary way.
                 attached_categories = getattr(ob, ATTACH_ATTR)
+                if not attached_categories.attached_to(ob):
+                    return
             except:
-                # some metaclasses do insane things when asked for an attribute
-                # (like not raising an AttributeError)
-                return
-            if not attached_categories.attached_to(ob):
                 return
             if category_keys is None:
                 category_keys = attached_categories.keys()
