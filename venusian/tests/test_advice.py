@@ -31,8 +31,11 @@ import unittest
 import sys
 from venusian import advice
 
-class ClassicClass:
-    classLevelFrameInfo = advice.getFrameInfo(sys._getframe())
+PY3 = sys.version_info[0] >= 3
+
+if not PY3:
+    class ClassicClass:
+        classLevelFrameInfo = advice.getFrameInfo(sys._getframe())
 
 class NewStyleClass(object):
     classLevelFrameInfo = advice.getFrameInfo(sys._getframe())
@@ -50,15 +53,16 @@ class FrameInfoTest(unittest.TestCase):
             self.assert_(d is globals())
         self.assertEqual(len(codeinfo), 4)
 
-    def testClassicClassInfo(self):
-        (kind, module, f_locals, f_globals,
-         codeinfo) = ClassicClass.classLevelFrameInfo
-        self.assertEquals(kind, "class")
+    if not PY3:
+        def testClassicClassInfo(self):
+            (kind, module, f_locals, f_globals,
+             codeinfo) = ClassicClass.classLevelFrameInfo
+            self.assertEquals(kind, "class")
 
-        self.assert_(f_locals is ClassicClass.__dict__)  # ???
-        for d in module.__dict__, f_globals:
-            self.assert_(d is globals())
-        self.assertEqual(len(codeinfo), 4)
+            self.assert_(f_locals is ClassicClass.__dict__)  # ???
+            for d in module.__dict__, f_globals:
+                self.assert_(d is globals())
+            self.assertEqual(len(codeinfo), 4)
 
     def testNewStyleClassInfo(self):
         (kind, module, f_locals,
