@@ -56,7 +56,7 @@ class Scanner(object):
             except:
                 return
             if category_keys is None:
-                category_keys = attached_categories.keys()
+                category_keys = list(attached_categories.keys())
                 category_keys.sort()
             for category in category_keys:
                 callbacks = attached_categories.get(category, [])

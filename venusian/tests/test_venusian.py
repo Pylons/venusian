@@ -19,10 +19,7 @@ class TestScanner(unittest.TestCase):
         scanner = self._makeOne(test=test)
         scanner.scan(one)
         self.assertEqual(len(test.registrations), 6)
-        test.registrations.sort(
-            lambda x, y: cmp((x['name'], x['ob'].__module__),
-                             (y['name'], y['ob'].__module__))
-            )
+        test.registrations.sort(key=lambda x: (x['name'], x['ob'].__module__))
         from venusian.tests.fixtures.one.module import function as func1
         from venusian.tests.fixtures.one.module2 import function as func2
         from venusian.tests.fixtures.one.module import inst as inst1
@@ -63,10 +60,7 @@ class TestScanner(unittest.TestCase):
         scanner = self._makeOne(test=test) 
         scanner.scan(pyc)
         self.assertEqual(len(test.registrations), 4)
-        test.registrations.sort(
-            lambda x, y: cmp((x['name'], x['ob'].__module__),
-                             (y['name'], y['ob'].__module__))
-            )
+        test.registrations.sort(key=lambda x: (x['name'], x['ob'].__module__))
         from venusian.tests.fixtures.pyc.module import function as func1
         from venusian.tests.fixtures.pyc.module import inst as inst1
         from venusian.tests.fixtures.pyc.module import Class as Class1
@@ -94,10 +88,7 @@ class TestScanner(unittest.TestCase):
         scanner = self._makeOne(test=test)
         scanner.scan(module)
         self.assertEqual(len(test.registrations), 3)
-        test.registrations.sort(
-            lambda x, y: cmp((x['name'], x['ob'].__module__),
-                             (y['name'], y['ob'].__module__))
-            )
+        test.registrations.sort(key=lambda x: (x['name'], x['ob'].__module__))
         from venusian.tests.fixtures.one.module import function as func1
         from venusian.tests.fixtures.one.module import inst as inst1
         from venusian.tests.fixtures.one.module import Class as Class1
@@ -167,10 +158,7 @@ class TestScanner(unittest.TestCase):
             test = Test()
             scanner = self._makeOne(test=test)
             scanner.scan(classdecorator)
-            test.registrations.sort(
-                lambda x, y: cmp((x['name'], x['ob'].__module__),
-                                 (y['name'], y['ob'].__module__))
-                )
+            test.registrations.sort(key=lambda x: (x['name'], x['ob'].__module__))
             self.assertEqual(len(test.registrations), 2)
             self.assertEqual(test.registrations[0]['name'], 'SubClass')
             self.assertEqual(test.registrations[0]['ob'],

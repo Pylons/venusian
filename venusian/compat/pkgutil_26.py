@@ -534,9 +534,10 @@ if 1: # pragma: no cover
             if os.path.isfile(pkgfile):
                 try:
                     f = open(pkgfile)
-                except IOError, msg:
+                except IOError:
+                    msg = sys.exc_info()[1]
                     sys.stderr.write("Can't open %s: %s\n" %
-                                     (pkgfile, msg))
+                                     (pkgfile, msg.args[0]))
                 else:
                     for line in f:
                         line = line.rstrip('\n')
