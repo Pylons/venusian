@@ -54,6 +54,17 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[5]['ob'], inst2)
         self.assertEqual(test.registrations[5]['instance'], True)
 
+    def test_package_without_recursion(self):
+        from venusian.tests.fixtures import recursion
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(recursion, recursive=False)
+        self.assertEqual(len(test.registrations), 1)
+
+        self.assertEqual(test.registrations[0]['name'], 'package_function')
+        self.assertEqual(test.registrations[0]['ob'], recursion.package_function)
+        self.assertEqual(test.registrations[0]['function'], True)
+
     def test_package_with_orphaned_pyc_file(self):
         # There is a module2.pyc file in the "pycfixtures" package; it
         # has no corresponding .py source file.  Such orphaned .pyc
