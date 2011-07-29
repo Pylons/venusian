@@ -28,24 +28,16 @@ $Id: test_advice.py 40836 2005-12-16 22:40:51Z benji_york $
 """
 
 import unittest
-from types import ClassType
 import sys
 from venusian import advice
 
-def ping(log, value):
+PY3 = sys.version_info[0] >= 3
 
-    def pong(klass):
-        log.append((value,klass))
-        return [klass]
+if not PY3:
+    class ClassicClass:
+        classLevelFrameInfo = advice.getFrameInfo(sys._getframe())
 
-    advice.addClassAdvisor(pong)
-
-class ClassicClass:
-    __metaclass__ = ClassType
-    classLevelFrameInfo = advice.getFrameInfo(sys._getframe())
-
-class NewStyleClass:
-    __metaclass__ = type
+class NewStyleClass(object):
     classLevelFrameInfo = advice.getFrameInfo(sys._getframe())
 
 moduleLevelFrameInfo = advice.getFrameInfo(sys._getframe())
@@ -61,15 +53,16 @@ class FrameInfoTest(unittest.TestCase):
             self.assert_(d is globals())
         self.assertEqual(len(codeinfo), 4)
 
-    def testClassicClassInfo(self):
-        (kind, module, f_locals, f_globals,
-         codeinfo) = ClassicClass.classLevelFrameInfo
-        self.assertEquals(kind, "class")
+    if not PY3:
+        def testClassicClassInfo(self):
+            (kind, module, f_locals, f_globals,
+             codeinfo) = ClassicClass.classLevelFrameInfo
+            self.assertEquals(kind, "class")
 
-        self.assert_(f_locals is ClassicClass.__dict__)  # ???
-        for d in module.__dict__, f_globals:
-            self.assert_(d is globals())
-        self.assertEqual(len(codeinfo), 4)
+            self.assert_(f_locals is ClassicClass.__dict__)  # ???
+            for d in module.__dict__, f_globals:
+                self.assert_(d is globals())
+            self.assertEqual(len(codeinfo), 4)
 
     def testNewStyleClassInfo(self):
         (kind, module, f_locals,
@@ -88,78 +81,3 @@ class FrameInfoTest(unittest.TestCase):
         for d in module.__dict__, f_globals:
             self.assert_(d is globals())
         self.assertEqual(len(codeinfo), 4)
-
-
-class AdviceTests(unittest.TestCase):
-
-    def testOrder(self):
-        log = []
-        class Foo(object):
-            ping(log, 1)
-            ping(log, 2)
-            ping(log, 3)
-
-        # Strip the list nesting
-        for i in 1,2,3:
-            self.assert_(isinstance(Foo, list))
-            Foo, = Foo
-
-        self.assertEquals(log, [(1, Foo), (2, [Foo]), (3, [[Foo]])])
-
-    def testDoubleType(self): # pragma: no cover
-        if sys.hexversion >= 0x02030000:
-            return  # you can't duplicate bases in 2.3
-        class aType(type,type):
-            ping([],1)
-        aType, = aType
-        self.assert_(aType.__class__ is type)
-
-    def testSingleExplicitMeta(self):
-
-        class M(type):
-            pass
-
-        class C(M):
-            __metaclass__ = M
-            ping([],1)
-
-        C, = C
-        self.assert_(C.__class__ is M)
-
-
-    def testMixedMetas(self):
-
-        class M1(type): pass
-        class M2(type): pass
-
-        class B1: __metaclass__ = M1
-        class B2: __metaclass__ = M2
-
-        try:
-            class C(B1,B2):
-                ping([],1)
-        except TypeError:
-            pass
-        else: # pragma: no cover
-            raise AssertionError("Should have gotten incompatibility error")
-
-        class M3(M1,M2): pass
-
-        class C(B1,B2):
-            __metaclass__ = M3
-            ping([],1)
-
-        self.assert_(isinstance(C,list))
-        C, = C
-        self.assert_(isinstance(C,M3))
-
-    def testMetaOfClass(self):
-
-        class metameta(type):
-            pass
-
-        class meta(type):
-            __metaclass__ = metameta
-
-        self.assertEquals(advice.determineMetaclass((meta, type)), metameta)
-
