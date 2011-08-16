@@ -53,14 +53,14 @@ def getFrameInfo(frame):
     frameinfo = inspect.getframeinfo(frame)
     try:
         sourceline = frameinfo[3][0].strip()
-    except:
+    except: # dont understand circumstance here, 3rdparty code without comment
         sourceline = frameinfo[3]
 
     codeinfo = frameinfo[0], frameinfo[1], frameinfo[2], sourceline
 
     if not namespaceIsModule:
         # some kind of funky exec
-        kind = "exec"
+        kind = "exec" # don't know how to repeat this scenario
     elif sameNamespace and not hasModule:
         kind = "module"
     elif sameName and not sameNamespace:
