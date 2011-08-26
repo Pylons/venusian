@@ -11,7 +11,7 @@ class Scanner(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
-    def scan(self, package, categories=None):
+    def scan(self, package, categories=None, recursive=True):
         """ Scan a Python package and any of its subpackages.  All
         top-level objects will be considered; those marked with
         venusian callback attributes related to ``category`` will be
@@ -66,7 +66,7 @@ class Scanner(object):
         for name, ob in inspect.getmembers(package):
             invoke(name, ob)
 
-        if hasattr(package, '__path__'): # package, not module
+        if recursive and hasattr(package, '__path__'): # package, not module
             results = walk_packages(package.__path__, package.__name__+'.')
 
             for importer, modname, ispkg in results:
