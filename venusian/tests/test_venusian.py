@@ -180,3 +180,26 @@ class TestScanner(unittest.TestCase):
                      ob=Class),
                 ])
             
+    def test_importerror_during_scan_default_onerror(self):
+        from venusian.tests.fixtures import importerror
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # without a custom onerror, scan will propagate the importerror from
+        # will_raise_importerror
+        self.assertRaises(ImportError, scanner.scan, importerror)
+
+    def test_importerror_during_scan_custom_onerror(self):
+        from venusian.tests.fixtures import importerror
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # with this custom onerror, scan will not propagate the importerror
+        # from will_raise_importerror
+        def onerror(name):
+            if not issubclass(sys.exc_info()[0], ImportError):
+                raise
+        scanner.scan(importerror, onerror=onerror)
+        self.assertEqual(len(test.registrations), 1)
+        from venusian.tests.fixtures.importerror import function as func1
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
