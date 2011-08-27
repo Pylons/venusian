@@ -11,7 +11,7 @@ class Scanner(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
-    def scan(self, package, categories=None):
+    def scan(self, package, categories=None, onerror=None):
         """ Scan a Python package and any of its subpackages.  All
         top-level objects will be considered; those marked with
         venusian callback attributes related to ``category`` will be
@@ -24,7 +24,33 @@ class Scanner(object):
         callback categories (each category usually a string) or the
         special value ``None`` which means all Venusian callback
         categories.  The default is ``None``.
+
+        The ``onerror`` argument should either be ``None`` or a callback
+        function which behaves the same way as the ``onerror`` callback
+        function described in
+        http://docs.python.org/library/pkgutil.html#pkgutil.walk_packages .
+
+        By default, during a scan, Venusian will propagate all errors that
+        happen during its code importing process, including
+        :exc:`ImportError`.  If you use a custom ``onerror`` callback, you
+        can change this behavior.
+        
+        Here's an example ``onerror`` callback that ignores
+        :exc:`ImportError`::
+
+            import sys
+            def onerror(name):
+                if not isinstance(sys.exc_info()[0], ImportError):
+                    raise # reraise the last exception
+
+        The ``name`` passed to ``onerror`` is the module or package dotted
+        name that could not be imported due to an exception.
         """
+        if onerror is None:
+            # by default, propagate all errors (for bw compat purposes)
+            def onerror(name):
+                raise
+
         seen = set()
         def invoke(name, ob):
             # in one scan, we only process each object once
@@ -67,7 +93,8 @@ class Scanner(object):
             invoke(name, ob)
 
         if hasattr(package, '__path__'): # package, not module
-            results = walk_packages(package.__path__, package.__name__+'.')
+            results = walk_packages(package.__path__, package.__name__+'.',
+                                    onerror=onerror)
 
             for importer, modname, ispkg in results:
                 loader = importer.find_module(modname)
@@ -79,10 +106,14 @@ class Scanner(object):
                         # NB: use __import__(modname) rather than
                         # loader.load_module(modname) to prevent
                         # inappropriate double-execution of module code
-                        __import__(modname)
-                        module = sys.modules[modname]
-                        for name, ob in inspect.getmembers(module, None):
-                            invoke(name, ob)
+                        try:
+                            __import__(modname)
+                        except Exception:
+                            onerror(modname)
+                        module = sys.modules.get(modname)
+                        if module is not None:
+                            for name, ob in inspect.getmembers(module, None):
+                                invoke(name, ob)
 
 class AttachInfo(object):
     """

@@ -180,3 +180,48 @@ class TestScanner(unittest.TestCase):
                      ob=Class),
                 ])
             
+    def test_importerror_during_scan_default_onerror(self):
+        from venusian.tests.fixtures import importerror
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # without a custom onerror, scan will propagate the importerror from
+        # will_raise_importerror
+        self.assertRaises(ImportError, scanner.scan, importerror)
+
+    def test_importerror_during_scan_custom_onerror(self):
+        from venusian.tests.fixtures import importerror
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # with this custom onerror, scan will not propagate the importerror
+        # from will_raise_importerror
+        def onerror(name):
+            if not issubclass(sys.exc_info()[0], ImportError):
+                raise
+        scanner.scan(importerror, onerror=onerror)
+        self.assertEqual(len(test.registrations), 1)
+        from venusian.tests.fixtures.importerror import function as func1
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+    def test_onerror_used_to_skip_subpackages_during_scan(self):
+        from venusian.tests.fixtures import subpackages
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # onerror can also be used to skip errors while scanning submodules
+        # e.g.: test modules under a given library
+        def ignore_child(name):
+            try:
+                import re
+                re.search(r"child", name).group()
+            except:
+                raise
+        scanner.scan(subpackages, onerror=ignore_child)
+        self.assertEqual(len(test.registrations), 2)
+        from venusian.tests.fixtures.subpackages import function as func1
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+        from venusian.tests.fixtures.subpackages.mod import Class as klass
+        self.assertEqual(test.registrations[1]['name'], 'Class')
+        self.assertEqual(test.registrations[1]['ob'], klass)
