@@ -394,6 +394,35 @@ scan categories by passing a ``categories`` argument.  For example:
 The default ``categories`` argument is ``None``, which means activate
 all Venusian callbacks during a scan regardless of their category.
 
+``onerror`` Scan Callback
+-------------------------
+
+By default, when Venusian scans a package, it will propagate all exceptions
+raised while attempting to import code.  You can use an ``onerror`` callback
+argument to :meth:`venusian.Scanner.scan` to change this behavior.
+
+The ``onerror`` argument should either be ``None`` or a callback function
+which behaves the same way as the ``onerror`` callback function described in
+http://docs.python.org/library/pkgutil.html#pkgutil.walk_packages .
+
+Here's an example ``onerror`` callback that ignores all :exc:`ImportError`
+exceptions:
+
+.. code-block:: python
+   :linenos:
+
+     import sys
+     def onerror(name):
+         if not issubclass(sys.exc_info()[0], ImportError):
+             raise # reraise the last exception
+
+The ``onerror`` callback should execute ``raise`` at some point if any
+exception is to be propagated, otherwise it can simply return.  The ``name``
+passed to ``onerror`` is the module or package dotted name that could not be
+imported due to an exception.
+
+.. note:: the ``onerror`` callback is new as of Venusian 1.0.
+
 Limitations and Audience
 ------------------------
 

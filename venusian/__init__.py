@@ -40,11 +40,13 @@ class Scanner(object):
 
             import sys
             def onerror(name):
-                if not isinstance(sys.exc_info()[0], ImportError):
+                if not issubclass(sys.exc_info()[0], ImportError):
                     raise # reraise the last exception
 
         The ``name`` passed to ``onerror`` is the module or package dotted
         name that could not be imported due to an exception.
+
+        .. note:: the ``onerror`` callback is new as of Venusian 1.0.
         """
         if onerror is None:
             # by default, propagate all errors (for bw compat purposes)
