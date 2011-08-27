@@ -204,7 +204,7 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[0]['ob'], func1)
         self.assertEqual(test.registrations[0]['function'], True)
 
-    def test_ignorepattern_using_onerror(self):
+    def test_onerror_used_to_skip_subpackages_during_scan(self):
         from venusian.tests.fixtures import subpackages
         test = Test()
         scanner = self._makeOne(test=test)
