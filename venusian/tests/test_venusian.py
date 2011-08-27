@@ -203,3 +203,23 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[0]['name'], 'function')
         self.assertEqual(test.registrations[0]['ob'], func1)
         self.assertEqual(test.registrations[0]['function'], True)
+
+    def test_ignorepattern_using_onerror(self):
+        from venusian.tests.fixtures import subpackages
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # onerror can also be used to skip errors while scanning submodules
+        # e.g.: test modules under a give library
+        def ignore_child(name):
+            import re
+            if re.search(r"child", name):
+                pass
+        scanner.scan(subpackages, onerror=ignore_child)
+        self.assertEqual(len(test.registrations), 2)
+        from venusian.tests.fixtures.subpackages import function as func1
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+        from venusian.tests.fixtures.subpackages.mod import Class as klass
+        self.assertEqual(test.registrations[1]['name'], 'Class')
+        self.assertEqual(test.registrations[1]['ob'], klass)
