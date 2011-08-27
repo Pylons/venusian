@@ -416,6 +416,15 @@ exceptions:
          if not issubclass(sys.exc_info()[0], ImportError):
              raise # reraise the last exception
 
+Here's how we'd use this callback:
+
+.. code-block:: python
+   :linenos:
+
+   import venusian
+   scanner = venusian.Scanner()
+   scanner.scan(theapp, onerror=onerror)
+
 The ``onerror`` callback should execute ``raise`` at some point if any
 exception is to be propagated, otherwise it can simply return.  The ``name``
 passed to ``onerror`` is the module or package dotted name that could not be
