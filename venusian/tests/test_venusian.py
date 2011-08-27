@@ -209,11 +209,13 @@ class TestScanner(unittest.TestCase):
         test = Test()
         scanner = self._makeOne(test=test)
         # onerror can also be used to skip errors while scanning submodules
-        # e.g.: test modules under a give library
+        # e.g.: test modules under a given library
         def ignore_child(name):
-            import re
-            if re.search(r"child", name):
-                pass
+            try:
+                import re
+                re.search(r"child", name).group()
+            except:
+                raise
         scanner.scan(subpackages, onerror=ignore_child)
         self.assertEqual(len(test.registrations), 2)
         from venusian.tests.fixtures.subpackages import function as func1
