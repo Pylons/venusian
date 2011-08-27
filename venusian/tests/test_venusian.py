@@ -195,8 +195,7 @@ class TestScanner(unittest.TestCase):
         # with this custom onerror, scan will not propagate the importerror
         # from will_raise_importerror
         def onerror(name):
-            if not issubclass(sys.exc_info()[0], ImportError):
-                raise
+            if not issubclass(sys.exc_info()[0], ImportError): raise
         scanner.scan(importerror, onerror=onerror)
         self.assertEqual(len(test.registrations), 1)
         from venusian.tests.fixtures.importerror import function as func1
@@ -204,24 +203,37 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[0]['ob'], func1)
         self.assertEqual(test.registrations[0]['function'], True)
 
-    def test_onerror_used_to_skip_subpackages_during_scan(self):
+    def test_attrerror_during_scan_custom_onerror(self):
+        from venusian.tests.fixtures import attrerror
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # with this custom onerror, scan will not propagate the importerror
+        # from will_raise_importerror
+        def onerror(name):
+            if not issubclass(sys.exc_info()[0], ImportError): raise
+        self.assertRaises(AttributeError, scanner.scan, attrerror,
+                          onerror=onerror)
+        self.assertEqual(len(test.registrations), 1)
+        from venusian.tests.fixtures.attrerror import function as func1
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+    def test_onerror_used_to_swallow_all_exceptions(self):
         from venusian.tests.fixtures import subpackages
         test = Test()
         scanner = self._makeOne(test=test)
         # onerror can also be used to skip errors while scanning submodules
         # e.g.: test modules under a given library
+        swallowed = []
         def ignore_child(name):
-            try:
-                import re
-                re.search(r"child", name).group()
-            except:
-                raise
+            swallowed.append(name)
         scanner.scan(subpackages, onerror=ignore_child)
-        self.assertEqual(len(test.registrations), 2)
+        self.assertEqual(swallowed,
+          ['venusian.tests.fixtures.subpackages.childpackage.will_cause_import_error',
+           'venusian.tests.fixtures.subpackages.mod2'])
+        self.assertEqual(len(test.registrations), 1)
         from venusian.tests.fixtures.subpackages import function as func1
         self.assertEqual(test.registrations[0]['name'], 'function')
         self.assertEqual(test.registrations[0]['ob'], func1)
         self.assertEqual(test.registrations[0]['function'], True)
-        from venusian.tests.fixtures.subpackages.mod import Class as klass
-        self.assertEqual(test.registrations[1]['name'], 'Class')
-        self.assertEqual(test.registrations[1]['ob'], klass)
