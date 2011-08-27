@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-Next release
-------------
+1.0a1 (2011-08-27)
+------------------
 
 - Python 3 compatibility.
 

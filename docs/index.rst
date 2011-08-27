@@ -6,7 +6,9 @@ decorators.  Instead of taking actions when a function, method, or
 class decorator is executed at import time, you can defer the action
 until a separate "scan" phase.
 
-This library is most useful for framework authors.
+This library is most useful for framework authors.  It is compatible with
+CPython versions 2.4, 2.5, 2.6, 2.7, and 3.2.  It also is known to work on
+PyPy 1.5 and Jython 2.5.2.
 
 .. note::
 

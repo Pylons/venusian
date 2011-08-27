@@ -12,8 +12,6 @@
 #
 ##############################################################################
 
-__version__ = '0.9'
-
 import os
 
 from setuptools import setup
@@ -31,7 +29,7 @@ except:
 requires = []
 
 setup(name='venusian',
-      version=__version__,
+      version='1.0a1',
       description='A library for deferring decorator actions',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
