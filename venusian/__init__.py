@@ -101,21 +101,27 @@ class Scanner(object):
             for importer, modname, ispkg in results:
                 loader = importer.find_module(modname)
                 if loader is not None: # happens on pypy with orphaned pyc
-                    module_type = loader.etc[2]
-                    # only scrape members from non-orphaned source files
-                    # and package directories
-                    if module_type in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
-                        # NB: use __import__(modname) rather than
-                        # loader.load_module(modname) to prevent
-                        # inappropriate double-execution of module code
-                        try:
-                            __import__(modname)
-                        except Exception:
-                            onerror(modname)
-                        module = sys.modules.get(modname)
-                        if module is not None:
-                            for name, ob in inspect.getmembers(module, None):
-                                invoke(name, ob)
+                    try:
+                        module_type = loader.etc[2]
+                        # only scrape members from non-orphaned source files
+                        # and package directories
+                        if module_type in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
+                            # NB: use __import__(modname) rather than
+                            # loader.load_module(modname) to prevent
+                            # inappropriate double-execution of module code
+                            try:
+                                __import__(modname)
+                            except Exception:
+                                onerror(modname)
+                            module = sys.modules.get(modname)
+                            if module is not None:
+                                for name, ob in inspect.getmembers(module,
+                                                                   None):
+                                    invoke(name, ob)
+                    finally:
+                        if  ( hasattr(loader, 'file') and
+                              hasattr(loader.file,'close') ):
+                            loader.file.close()
 
 class AttachInfo(object):
     """
