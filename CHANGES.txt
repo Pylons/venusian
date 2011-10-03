@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-Next release
-------------
+1.0a2 (2011-09-02)
+------------------
 
 - Close ImpLoader file handle to avoid resource warnings on Python 3.
 

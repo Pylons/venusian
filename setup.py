@@ -29,7 +29,7 @@ except:
 requires = []
 
 setup(name='venusian',
-      version='1.0a1',
+      version='1.0a2',
       description='A library for deferring decorator actions',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
