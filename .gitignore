@@ -20,3 +20,4 @@ pypyenv/
 build/
 dist/
 venusian/coverage.xml
+docs/_build/
