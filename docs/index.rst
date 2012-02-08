@@ -434,6 +434,107 @@ imported due to an exception.
 
 .. note:: the ``onerror`` callback is new as of Venusian 1.0.
 
+``ignore`` Scan Argument
+------------------------
+
+The ``ignore`` to ``ccan`` allows you to ignore certain modules, packages, or
+global objects during a scan.  It should be a sequence containing strings
+and/or callables that will be used to match against the full dotted name of
+each object encountered during the scanning process.  If the ignore value you
+provide matches a package name, global objects contained by that package as
+well any submodules and subpackages of the package (and any global objects
+contained by them) will be ignored.  If the ignore value you provide matches
+a module name, any global objects in that module will be ignored.  If the
+ignore value you provide matches a global object that lives in a package or
+module, only that particular global object will be ignored.
+
+The sequence can contain any of these three types of objects:
+
+- A string representing a full dotted name.  To name an object by dotted
+  name, use a string representing the full dotted name.  For example, if you
+  want to ignore the ``my.package`` package and any of its subobjects or
+  subpackages during the scan, pass ``ignore=['my.package']``.  If the string
+  matches a global object (e.g. ``ignore=['my.package.MyClass']``), only that
+  object will be ignored and the rest of the objects in the module or
+  package that contains the object will be processed.
+
+- A string representing a relative dotted name.  To name an object relative
+  to the ``package`` passed to this method, use a string beginning with a
+  dot.  For example, if the ``package`` you've passed is imported as
+  ``my.package``, and you pass ``ignore=['.mymodule']``, the
+  ``my.package.mymodule`` mymodule and any of its subobjects or subpackages
+  will be omitted during scan processing.  If the string matches a global
+  object (e.g. ``ignore=['my.package.MyClass']``), only that object will be
+  ignored and the rest of the objects in the module or package that contains
+  the object will be processed.
+
+- A callable that accepts a full dotted name string of an object as its
+  single positional argument and returns ``True`` or ``False``.  If the
+  callable returns ``True`` or anything else truthy, the module, package, or
+  global object is ignored, if it returns ``False`` or anything else falsy,
+  it is not ignored.  If the callable matches a package name, the package as
+  well as any of that package's submodules and subpackages will be ignored.
+  If the callable matches a module name, that module and any of its contained
+  global objects will be ignored.  If the regex mactches a global object
+  name, only that object name will be ignored.  For example, if you want to
+  skip all packages, modules, and global objects beginning with the word
+  "test", you can use ``ignore=[re.compile('test').match]``.
+
+Here's an example of how we might use the ``ignore`` argument to ``scan`` to
+ignore an entire package by absolute dotted name:
+
+.. code-block:: python
+   :linenos:
+
+   import venusian
+   scanner = venusian.Scanner()
+   scanner.scan(theapp, ignore=['theapp.package'])
+
+Here's an example of how we might use the ``ignore`` argument to ``scan`` to
+ignore an entire package by relative dotted name (``theapp.package``):
+
+.. code-block:: python
+   :linenos:
+
+   import venusian
+   scanner = venusian.Scanner()
+   scanner.scan(theapp, ignore=['.package'])
+
+Here's an example of how we might use the ``ignore`` argument to ``scan`` to
+ignore a particular class:
+
+.. code-block:: python
+   :linenos:
+
+   import venusian
+   scanner = venusian.Scanner()
+   scanner.scan(theapp, ignore=['theapp.package.MyClass'])
+
+Here's an example of how we might use the ``ignore`` argument to ``scan`` to
+ignore any module, package, or global object that has a name which begins
+with the string ``test``:
+
+.. code-block:: python
+   :linenos:
+
+   import re
+   import venusian
+   scanner = venusian.Scanner()
+   scanner.scan(theapp, ignore=[re.compile('test').match])
+
+You can mix and match the three types of strings in the list.  For example,
+if the package being scanned is named ``my``, ``ignore=['my.package',
+'.someothermodule', re.compile('test').match]`` would cause ``my.package``
+(and all its submodules and subobjects) to be ignored, ``my.someothermodule``
+to be ignored, and any modules, packages, or global objects found during the
+scan that start with the name ``test`` to be ignored.
+
+Packages and modules matched by any ignore in the list will not be imported,
+and their top-level code will not be run as a result.
+
+.. note:: the ``ignore`` argument is new as of Venusian 1.1.
+
+
 Limitations and Audience
 ------------------------
 
