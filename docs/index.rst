@@ -524,12 +524,12 @@ with the string ``test``:
    scanner = venusian.Scanner()
    scanner.scan(theapp, ignore=[re.compile('test').match])
 
-You can mix and match the three types in the list.  For example, if the
-package being scanned is named ``my``, ``ignore=['my.package',
-'.someothermodule', re.compile('test').match]`` would cause ``my.package``
-(and all its submodules and subobjects) to be ignored, ``my.someothermodule``
-to be ignored, and any modules, packages, or global objects found during the
-scan that start with the name ``test`` to be ignored.
+You can mix and match the three types in the list.  For example,
+``scanner.scan(my, ignore=['my.package', '.someothermodule',
+re.compile('test').match])`` would cause ``my.package`` (and all its
+submodules and subobjects) to be ignored, ``my.someothermodule`` to be
+ignored, and any modules, packages, or global objects found during the scan
+that start with the name ``test`` to be ignored beneath the ``my`` package.
 
 Packages and modules matched by any ignore in the list will not be imported,
 and their top-level code will not be run as a result.
