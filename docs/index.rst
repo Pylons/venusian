@@ -452,36 +452,37 @@ The sequence can contain any of these three types of objects:
 
 - A string representing a full dotted name.  To name an object by dotted
   name, use a string representing the full dotted name.  For example, if you
-  want to ignore the ``my.package`` package and any of its subobjects or
-  subpackages during the scan, pass ``ignore=['my.package']``.  If the string
-  matches a global object (e.g. ``ignore=['my.package.MyClass']``), only that
-  object will be ignored and the rest of the objects in the module or
-  package that contains the object will be processed.
+  want to ignore the ``my.package`` package and any of its subobjects during
+  the scan, pass ``ignore=['my.package']``.  If the string matches a global
+  object (e.g. ``ignore=['my.package.MyClass']``), only that object will be
+  ignored and the rest of the objects in the module or package that contains
+  the object will be processed.
 
 - A string representing a relative dotted name.  To name an object relative
   to the ``package`` passed to this method, use a string beginning with a
   dot.  For example, if the ``package`` you've passed is imported as
   ``my.package``, and you pass ``ignore=['.mymodule']``, the
-  ``my.package.mymodule`` mymodule and any of its subobjects or subpackages
-  will be omitted during scan processing.  If the string matches a global
-  object (e.g. ``ignore=['my.package.MyClass']``), only that object will be
-  ignored and the rest of the objects in the module or package that contains
-  the object will be processed.
+  ``my.package.mymodule`` module and any of its subobjects will be omitted
+  during scan processing.  If the string matches a global object
+  (e.g. ``ignore=['my.package.MyClass']``), only that object will be ignored
+  and the rest of the objects in the module or package that contains the
+  object will be processed.
 
 - A callable that accepts a full dotted name string of an object as its
   single positional argument and returns ``True`` or ``False``.  If the
   callable returns ``True`` or anything else truthy, the module, package, or
   global object is ignored, if it returns ``False`` or anything else falsy,
   it is not ignored.  If the callable matches a package name, the package as
-  well as any of that package's submodules and subpackages will be ignored.
-  If the callable matches a module name, that module and any of its contained
-  global objects will be ignored.  If the regex mactches a global object
-  name, only that object name will be ignored.  For example, if you want to
-  skip all packages, modules, and global objects beginning with the word
-  "test", you can use ``ignore=[re.compile('test').match]``.
+  well as any of that package's submodules and subpackages (recursively) will
+  be ignored.  If the callable matches a module name, that module and any of
+  its contained global objects will be ignored.  If the callable mactches a
+  global object name, only that object name will be ignored.  For example, if
+  you want to skip all packages, modules, and global objects beginning with
+  the word "test", you can use ``ignore=[re.compile('test').match]``.
 
 Here's an example of how we might use the ``ignore`` argument to ``scan`` to
-ignore an entire package by absolute dotted name:
+ignore an entire package (and any of its submodules and subpackages) by
+absolute dotted name:
 
 .. code-block:: python
    :linenos:
@@ -491,7 +492,8 @@ ignore an entire package by absolute dotted name:
    scanner.scan(theapp, ignore=['theapp.package'])
 
 Here's an example of how we might use the ``ignore`` argument to ``scan`` to
-ignore an entire package by relative dotted name (``theapp.package``):
+ignore an entire package (and any of its submodules and subpackages) by
+relative dotted name (``theapp.package``):
 
 .. code-block:: python
    :linenos:
@@ -501,7 +503,7 @@ ignore an entire package by relative dotted name (``theapp.package``):
    scanner.scan(theapp, ignore=['.package'])
 
 Here's an example of how we might use the ``ignore`` argument to ``scan`` to
-ignore a particular class:
+ignore a particular class object:
 
 .. code-block:: python
    :linenos:
