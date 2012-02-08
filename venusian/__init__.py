@@ -119,6 +119,7 @@ class Scanner(object):
             return False
 
         seen = set()
+
         def invoke(mod_name, name, ob):
             # in one scan, we only process each object once
             if id(ob) in seen:
@@ -163,7 +164,8 @@ class Scanner(object):
 
         for name, ob in getmembers(package):
             # whether it's a module or a package, we need to scan its
-            # members; walk_packages only iterates over submodules
+            # members; walk_packages only iterates over submodules and
+            # subpackages
             invoke(pkg_name, name, ob)
 
         if hasattr(package, '__path__'): # package, not module
@@ -316,9 +318,12 @@ def walk_packages(path=None, prefix='', onerror=None, ignore=None):
             return True
         m[p] = True
 
+    # iter_modules is nonrecursive
     for importer, name, ispkg in iter_modules(path, prefix):
 
         if ignore is not None and ignore(name):
+            # if name is a package, ignoring here will cause
+            # all subpackages and submodules to be ignored too
             continue
 
         # do any onerror handling before yielding
