@@ -3,6 +3,7 @@ import inspect
 import sys
 
 from venusian.compat import walk_packages
+from venusian.compat import is_nonstr_iter
 from venusian.advice import getFrameInfo
 
 ATTACH_ATTR = '__venusian_callbacks__'
@@ -11,7 +12,7 @@ class Scanner(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
-    def scan(self, package, categories=None, onerror=None):
+    def scan(self, package, categories=None, onerror=None, ignore=None):
         """ Scan a Python package and any of its subpackages.  All
         top-level objects will be considered; those marked with
         venusian callback attributes related to ``category`` will be
@@ -32,8 +33,9 @@ class Scanner(object):
 
         By default, during a scan, Venusian will propagate all errors that
         happen during its code importing process, including
-        :exc:`ImportError`.  If you use a custom ``onerror`` callback, you
-        can change this behavior.
+        :exc:`ImportError` *except* for modules and packages named in
+        ``ignore``.  If you use a custom ``onerror`` callback, you can change
+        this behavior.
         
         Here's an example ``onerror`` callback that ignores
         :exc:`ImportError`::
@@ -47,19 +49,68 @@ class Scanner(object):
         name that could not be imported due to an exception.
 
         .. note:: the ``onerror`` callback is new as of Venusian 1.0.
+
+        ``ignore`` allows you to ignore certain modules, packages, or global
+        objects during a scan.  It should be a sequence containing strings
+        and/or callables that will be used to match against the full dotted
+        name of each object encountered during a scan.  The sequence can
+        contain any of these three types of objects:
+
+        - A string representing a full dotted name.  To name an object by
+          dotted name, use a string representing the full dotted name.  For
+          example, if you want to ignore the ``my.package`` package *and any
+          of its subobjects or subpackages* during the scan, pass
+          ``ignore=['my.package']``.
+
+        - A string representing a relative dotted name.  To name an object
+          relative to the ``package`` passed to this method, use a string
+          beginning with a dot.  For example, if the ``package`` you've
+          passed is imported as ``my.package``, and you pass
+          ``ignore=['.mymodule']``, the ``my.package.mymodule`` mymodule *and
+          any of its subobjects or subpackages* will be omitted during scan
+          processing.
+
+        - A callable that accepts a full dotted name string of an object as
+          its single positional argument and returns ``True`` or ``False``.
+          For example, if you want to skip all packages, modules, and global
+          objects beginning with the word "test", you can use
+          ``ignore=[re.compile('test').match]``.  If the function returns
+          ``True`` (or anything else truthy), the object is ignored, if it
+          returns ``False`` (or anything else falsy) the object is not
+          ignored.  *Note that unlike string matches, ignores that use a
+          function don't cause submodules and subobjects of the module or
+          package represented by a dotted name to also be ignored.*
+
+        You can mix and match the three types of strings in the list.  For
+        example: ``ignore=['my.package', '.someothermodule',
+        re.compile('test').match]``.
+        
+        .. note:: the ``ignore`` argument is new as of Venusian 1.1.
         """
+
+        pkg_name = package.__name__
+
+        if ignore is not None and not is_nonstr_iter(ignore):
+            ignore = [ignore]
+        
         if onerror is None:
-            # by default, propagate all errors (for bw compat purposes)
+            # by default, propagate all errors except those for ignored names
             def onerror(name):
+                if _ignore(ignore, name, pkg_name):
+                    return
                 raise
 
         seen = set()
-        def invoke(name, ob):
+        def invoke(mod_name, name, ob):
             # in one scan, we only process each object once
             if id(ob) in seen:
                 return
             seen.add(id(ob))
-            
+            fullname = mod_name + '.' + name
+
+            if _ignore(ignore, fullname, pkg_name):
+                return
+
             category_keys = categories
             try:
                 # Some metaclasses do insane things when asked for an
@@ -92,7 +143,7 @@ class Scanner(object):
                     callback(self, name, ob)
 
         for name, ob in inspect.getmembers(package):
-            invoke(name, ob)
+            invoke(pkg_name, name, ob)
 
         if hasattr(package, '__path__'): # package, not module
             results = walk_packages(package.__path__, package.__name__+'.',
@@ -117,11 +168,31 @@ class Scanner(object):
                             if module is not None:
                                 for name, ob in inspect.getmembers(module,
                                                                    None):
-                                    invoke(name, ob)
+                                    invoke(modname, name, ob)
                     finally:
                         if  ( hasattr(loader, 'file') and
                               hasattr(loader.file,'close') ):
                             loader.file.close()
+
+def _ignore(ignore, fullname, pkg_name):
+    if ignore is not None:
+        for ign in ignore:
+            if isinstance(ign, str):
+                if ign.startswith('.'):
+                    # leading dotted name relative to scanned package
+                    if fullname.startswith(pkg_name + ign):
+                        return True
+                else:
+                    # non-leading-dotted name absolute object name
+                    if fullname.startswith(ign):
+                        return True
+            else:
+                # function
+                if ign(fullname):
+                    return True
+    return False
+
+    
 
 class AttachInfo(object):
     """

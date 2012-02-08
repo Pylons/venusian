@@ -185,8 +185,18 @@ class TestScanner(unittest.TestCase):
         test = Test()
         scanner = self._makeOne(test=test)
         # without a custom onerror, scan will propagate the importerror from
-        # will_raise_importerror
+        # will_cause_import_error
         self.assertRaises(ImportError, scanner.scan, importerror)
+
+    def test_importerror_during_scan_default_onerror_with_ignore(self):
+        from venusian.tests.fixtures import importerror
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # scan will ignore the errors from will_cause_import_error due
+        # to us choosing to ignore that package
+        scanner.scan(
+            importerror,
+            ignore='venusian.tests.fixtures.importerror.will_cause_import_error')
 
     def test_importerror_during_scan_custom_onerror(self):
         from venusian.tests.fixtures import importerror
@@ -237,3 +247,111 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[0]['name'], 'function')
         self.assertEqual(test.registrations[0]['ob'], func1)
         self.assertEqual(test.registrations[0]['function'], True)
+
+    def test_ignore_by_full_dotted_name(self):
+        from venusian.tests.fixtures import one
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(
+            one, 
+            ignore=['venusian.tests.fixtures.one.module2']
+            )
+        self.assertEqual(len(test.registrations), 3)
+        from venusian.tests.fixtures.one.module import function as func1
+        from venusian.tests.fixtures.one.module import inst as inst1
+        from venusian.tests.fixtures.one.module import Class as Class1
+
+        self.assertEqual(test.registrations[0]['name'], 'Class')
+        self.assertEqual(test.registrations[0]['ob'], Class1)
+        self.assertEqual(test.registrations[0]['method'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func1)
+        self.assertEqual(test.registrations[1]['function'], True)
+
+        self.assertEqual(test.registrations[2]['name'], 'inst')
+        self.assertEqual(test.registrations[2]['ob'], inst1)
+        self.assertEqual(test.registrations[2]['instance'], True)
+
+    def test_ignore_by_relative_dotted_name(self):
+        from venusian.tests.fixtures import one
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(one,  ignore=['.module2'])
+        self.assertEqual(len(test.registrations), 3)
+        from venusian.tests.fixtures.one.module import function as func1
+        from venusian.tests.fixtures.one.module import inst as inst1
+        from venusian.tests.fixtures.one.module import Class as Class1
+
+        self.assertEqual(test.registrations[0]['name'], 'Class')
+        self.assertEqual(test.registrations[0]['ob'], Class1)
+        self.assertEqual(test.registrations[0]['method'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func1)
+        self.assertEqual(test.registrations[1]['function'], True)
+
+        self.assertEqual(test.registrations[2]['name'], 'inst')
+        self.assertEqual(test.registrations[2]['ob'], inst1)
+        self.assertEqual(test.registrations[2]['instance'], True)
+        
+    def test_ignore_by_function(self):
+        import re
+        from venusian.tests.fixtures import one
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(one, ignore=[re.compile('Class').search, 
+                                  re.compile('inst').search])
+        self.assertEqual(len(test.registrations), 2)
+        from venusian.tests.fixtures.one.module import function as func1
+        from venusian.tests.fixtures.one.module2 import function as func2
+
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func2)
+        self.assertEqual(test.registrations[1]['function'], True)
+
+    def test_ignore_as_string(self):
+        from venusian.tests.fixtures import one
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(one, ignore='venusian.tests.fixtures.one.module2')
+        self.assertEqual(len(test.registrations), 3)
+        from venusian.tests.fixtures.one.module import function as func1
+        from venusian.tests.fixtures.one.module import inst as inst1
+        from venusian.tests.fixtures.one.module import Class as Class1
+
+        self.assertEqual(test.registrations[0]['name'], 'Class')
+        self.assertEqual(test.registrations[0]['ob'], Class1)
+        self.assertEqual(test.registrations[0]['method'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func1)
+        self.assertEqual(test.registrations[1]['function'], True)
+
+        self.assertEqual(test.registrations[2]['name'], 'inst')
+        self.assertEqual(test.registrations[2]['ob'], inst1)
+        self.assertEqual(test.registrations[2]['instance'], True)
+        
+    def test_ignore_mixed_string_and_func(self):
+        import re
+        from venusian.tests.fixtures import one
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(one, ignore=['venusian.tests.fixtures.one.module2',
+                                  re.compile('inst').search])
+        self.assertEqual(len(test.registrations), 2)
+        from venusian.tests.fixtures.one.module import function as func1
+        from venusian.tests.fixtures.one.module import Class as Class1
+
+        self.assertEqual(test.registrations[0]['name'], 'Class')
+        self.assertEqual(test.registrations[0]['ob'], Class1)
+        self.assertEqual(test.registrations[0]['method'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func1)
+        self.assertEqual(test.registrations[1]['function'], True)
+
