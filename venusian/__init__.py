@@ -1,8 +1,8 @@
 import imp
-import inspect
+from inspect import getmembers
 import sys
 
-from venusian.compat import walk_packages
+from venusian.compat import iter_modules
 from venusian.compat import is_nonstr_iter
 from venusian.advice import getFrameInfo
 
@@ -30,12 +30,10 @@ class Scanner(object):
         function which behaves the same way as the ``onerror`` callback
         function described in
         http://docs.python.org/library/pkgutil.html#pkgutil.walk_packages .
-
         By default, during a scan, Venusian will propagate all errors that
         happen during its code importing process, including
-        :exc:`ImportError` *except* for modules and packages named in
-        ``ignore``.  If you use a custom ``onerror`` callback, you can change
-        this behavior.
+        :exc:`ImportError`.  If you use a custom ``onerror`` callback, you
+        can change this behavior.
         
         Here's an example ``onerror`` callback that ignores
         :exc:`ImportError`::
@@ -74,16 +72,25 @@ class Scanner(object):
           its single positional argument and returns ``True`` or ``False``.
           For example, if you want to skip all packages, modules, and global
           objects beginning with the word "test", you can use
-          ``ignore=[re.compile('test').match]``.  If the function returns
+          ``ignore=[re.compile('test').match]``.  If the callable returns
           ``True`` (or anything else truthy), the object is ignored, if it
           returns ``False`` (or anything else falsy) the object is not
           ignored.  *Note that unlike string matches, ignores that use a
-          function don't cause submodules and subobjects of the module or
-          package represented by a dotted name to also be ignored.*
+          callable don't cause submodules and subobjects of a module or
+          package represented by a dotted name to also be ignored, they match
+          individual objects found during a scan, including packages,
+          modules, and global objects*.
 
         You can mix and match the three types of strings in the list.  For
-        example: ``ignore=['my.package', '.someothermodule',
-        re.compile('test').match]``.
+        example, if the package being scanned is ``my``,
+        ``ignore=['my.package', '.someothermodule',
+        re.compile('test').match]`` would cause ``my.package`` (and all its
+        submodules and subobjects) to be ignored, ``my.someothermodule`` to
+        be ignored, and any modules, packages, or global objects found during
+        the scan that start with the name ``test`` to be ignored.
+
+        Note that packages and modules matched by any ignore in the list will
+        not be imported, and their top-level code will not be run as a result.
         
         .. note:: the ``ignore`` argument is new as of Venusian 1.1.
         """
@@ -93,12 +100,23 @@ class Scanner(object):
         if ignore is not None and not is_nonstr_iter(ignore):
             ignore = [ignore]
         
-        if onerror is None:
-            # by default, propagate all errors except those for ignored names
-            def onerror(name):
-                if _ignore(ignore, name, pkg_name):
-                    return
-                raise
+        def _ignore(fullname):
+            if ignore is not None:
+                for ign in ignore:
+                    if isinstance(ign, str):
+                        if ign.startswith('.'):
+                            # leading dotted name relative to scanned package
+                            if fullname.startswith(pkg_name + ign):
+                                return True
+                        else:
+                            # non-leading-dotted name absolute object name
+                            if fullname.startswith(ign):
+                                return True
+                    else:
+                        # function
+                        if ign(fullname):
+                            return True
+            return False
 
         seen = set()
         def invoke(mod_name, name, ob):
@@ -106,9 +124,10 @@ class Scanner(object):
             if id(ob) in seen:
                 return
             seen.add(id(ob))
+
             fullname = mod_name + '.' + name
 
-            if _ignore(ignore, fullname, pkg_name):
+            if _ignore(fullname):
                 return
 
             category_keys = categories
@@ -142,12 +161,14 @@ class Scanner(object):
                 for callback in callbacks:
                     callback(self, name, ob)
 
-        for name, ob in inspect.getmembers(package):
+        for name, ob in getmembers(package):
+            # whether it's a module or a package, we need to scan its
+            # members; walk_packages only iterates over submodules
             invoke(pkg_name, name, ob)
 
         if hasattr(package, '__path__'): # package, not module
             results = walk_packages(package.__path__, package.__name__+'.',
-                                    onerror=onerror)
+                                    onerror=onerror, ignore=_ignore)
 
             for importer, modname, ispkg in results:
                 loader = importer.find_module(modname)
@@ -163,36 +184,18 @@ class Scanner(object):
                             try:
                                 __import__(modname)
                             except Exception:
-                                onerror(modname)
+                                if onerror is not None:
+                                    onerror(modname)
+                                else:
+                                    raise
                             module = sys.modules.get(modname)
                             if module is not None:
-                                for name, ob in inspect.getmembers(module,
-                                                                   None):
+                                for name, ob in getmembers(module, None):
                                     invoke(modname, name, ob)
                     finally:
                         if  ( hasattr(loader, 'file') and
                               hasattr(loader.file,'close') ):
                             loader.file.close()
-
-def _ignore(ignore, fullname, pkg_name):
-    if ignore is not None:
-        for ign in ignore:
-            if isinstance(ign, str):
-                if ign.startswith('.'):
-                    # leading dotted name relative to scanned package
-                    if fullname.startswith(pkg_name + ign):
-                        return True
-                else:
-                    # non-leading-dotted name absolute object name
-                    if fullname.startswith(ign):
-                        return True
-            else:
-                # function
-                if ign(fullname):
-                    return True
-    return False
-
-    
 
 class AttachInfo(object):
     """
@@ -271,3 +274,74 @@ def attach(wrapped, callback, category=None, depth=1):
     return AttachInfo(
         scope=scope, module=module, locals=f_locals, globals=f_globals,
         category=category, codeinfo=codeinfo)
+
+def walk_packages(path=None, prefix='', onerror=None, ignore=None):
+    """Yields (module_loader, name, ispkg) for all modules recursively
+    on path, or, if path is None, all accessible modules.
+
+    'path' should be either None or a list of paths to look for
+    modules in.
+
+    'prefix' is a string to output on the front of every module name
+    on output.
+
+    Note that this function must import all *packages* (NOT all
+    modules!) on the given path, in order to access the __path__
+    attribute to find submodules.
+
+    'onerror' is a function which gets called with one argument (the
+    name of the package which was being imported) if any exception
+    occurs while trying to import a package.  If no onerror function is
+    supplied, ImportErrors are caught and ignored, while all other
+    exceptions are propagated, terminating the search.
+
+    'ignore' is a function fed a fullly dotted name; if it returns True, the
+    object is skipped and not returned in results (and if it's a package it's
+    not imported).
+
+    Examples:
+
+    # list all modules python can access
+    walk_packages()
+
+    # list all submodules of ctypes
+    walk_packages(ctypes.__path__, ctypes.__name__+'.')
+
+    # NB: we can't just use pkgutils.walk_packages because we need to ignore
+    # things
+    """
+
+    def seen(p, m={}):
+        if p in m: # pragma: no cover
+            return True
+        m[p] = True
+
+    for importer, name, ispkg in iter_modules(path, prefix):
+
+        if ignore is not None and ignore(name):
+            continue
+
+        # do any onerror handling before yielding
+
+        if ispkg:
+            try:
+                __import__(name)
+            except ImportError:
+                if onerror is not None:
+                    onerror(name)
+            except Exception:
+                if onerror is not None:
+                    onerror(name)
+                else:
+                    raise
+            else:
+                yield importer, name, ispkg
+                path = getattr(sys.modules[name], '__path__', None) or []
+
+                # don't traverse path items we've seen before
+                path = [p for p in path if not seen(p)]
+
+                for item in walk_packages(path, name+'.', onerror):
+                    yield item
+        else:
+            yield importer, name, ispkg

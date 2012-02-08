@@ -3,9 +3,9 @@ import sys
 PY3 = sys.version_info[0] == 3
 
 try: # pragma: no cover
-    from pkgutil import walk_packages
+    from pkgutil import iter_modules
 except ImportError: # pragma: no cover
-    from pkgutil_26 import walk_packages
+    from pkgutil_26 import iter_modules
 
 if PY3: # pragma: no cover
     def is_nonstr_iter(v):

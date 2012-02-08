@@ -213,6 +213,23 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[0]['ob'], func1)
         self.assertEqual(test.registrations[0]['function'], True)
 
+    def test_importerror_in_package_during_scan_custom_onerror(self):
+        from venusian.tests.fixtures import importerror_package
+        md('venusian.tests.fixtures.importerror_package.will_cause_import_error')
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # with this custom onerror, scan will not propagate the importerror
+        # from will_raise_importerror
+        def onerror(name):
+            raise ValueError
+        self.assertRaises(ValueError, scanner.scan, importerror_package,
+                          onerror=onerror)
+        self.assertEqual(len(test.registrations), 1)
+        from venusian.tests.fixtures.importerror_package import function as func1
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+
     def test_attrerror_during_scan_custom_onerror(self):
         from venusian.tests.fixtures import attrerror
         test = Test()
@@ -229,6 +246,35 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[0]['ob'], func1)
         self.assertEqual(test.registrations[0]['function'], True)
 
+    def test_attrerror_in_package_during_scan_custom_onerror(self):
+        from venusian.tests.fixtures import attrerror_package
+        md('venusian.tests.fixtures.attrerror_package.will_cause_import_error')
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # with this custom onerror, scan will not propagate the importerror
+        # from will_raise_importerror
+        def onerror(name):
+            if not issubclass(sys.exc_info()[0], ImportError): raise
+        self.assertRaises(AttributeError, scanner.scan, attrerror_package,
+                          onerror=onerror)
+        self.assertEqual(len(test.registrations), 1)
+        from venusian.tests.fixtures.attrerror_package import function as func1
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+        
+    def test_attrerror_in_package_during_scan_no_custom_onerror(self):
+        from venusian.tests.fixtures import attrerror_package
+        md('venusian.tests.fixtures.attrerror_package.will_cause_import_error')
+        test = Test()
+        scanner = self._makeOne(test=test)
+        self.assertRaises(AttributeError, scanner.scan, attrerror_package)
+        self.assertEqual(len(test.registrations), 1)
+        from venusian.tests.fixtures.attrerror_package import function as func1
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+        
     def test_onerror_used_to_swallow_all_exceptions(self):
         from venusian.tests.fixtures import subpackages
         test = Test()
@@ -355,3 +401,7 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[1]['ob'], func1)
         self.assertEqual(test.registrations[1]['function'], True)
 
+def md(name):
+    if name in sys.modules:
+        del sys.modules[name]
+    
