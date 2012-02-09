@@ -21,3 +21,4 @@ build/
 dist/
 venusian/coverage.xml
 docs/_build/
+docs/_themes/
