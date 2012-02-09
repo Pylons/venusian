@@ -117,6 +117,10 @@ exclude_patterns = ['_themes/README.rst',]
 # Options for HTML output
 # -----------------------
 
+html_theme_options = {
+    'github_url': 'https://github.com/Pylons/venusian'
+}
+
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
@@ -132,7 +136,7 @@ exclude_patterns = ['_themes/README.rst',]
 
 # The name of an image file (within the static path) to place at the top of
 # the sidebar.
-html_logo = '.static/logo_hi.gif'
+#html_logo = '.static/logo_hi.gif'
 
 # The name of an image file (within the static path) to use as favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or
