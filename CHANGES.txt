@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+Next release
+------------
+
+- Add an ``ignore`` argument to the ``scan`` method of a ``Scanner``.  This
+  argument allows a user to ignore packages, modules, and global objects by
+  name during a ``scan``.  See the "The ignore Argument" in the narrative
+  documentation for more details.
+
 1.0a2 (2011-09-02)
 ------------------
 
