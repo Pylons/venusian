@@ -29,7 +29,7 @@ except:
 requires = []
 
 setup(name='venusian',
-      version='1.0a2',
+      version='1.0a3',
       description='A library for deferring decorator actions',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -37,6 +37,7 @@ setup(name='venusian',
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.2",
           ],
       keywords='web wsgi zope',
       author="Chris McDonough, Agendaless Consulting",

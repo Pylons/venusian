@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-Next release
-------------
+1.0a3 (2012-02-08)
+------------------
 
 - Add an ``ignore`` argument to the ``scan`` method of a ``Scanner``.  This
   argument allows a user to ignore packages, modules, and global objects by
