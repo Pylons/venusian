@@ -38,12 +38,7 @@ if 'sphinx-build' in ' '.join(sys.argv): # protect against dumb importers
     sys.path.append(os.path.abspath(parent))
     wd = os.getcwd()
     os.chdir(parent)
-    os.system('%s setup.py develop' % sys.executable)
-    os.chdir(wd)
-
-    for item in os.listdir(parent):
-        if item.endswith('.egg'):
-            sys.path.append(os.path.join(parent, item))
+    sys.path.append(parent)
 
 # Options for HTML output
 # -----------------------

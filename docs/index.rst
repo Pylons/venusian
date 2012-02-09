@@ -477,8 +477,9 @@ The sequence can contain any of these three types of objects:
   be ignored.  If the callable matches a module name, that module and any of
   its contained global objects will be ignored.  If the callable mactches a
   global object name, only that object name will be ignored.  For example, if
-  you want to skip all packages, modules, and global objects beginning with
-  the word "test", you can use ``ignore=[re.compile('test').match]``.
+  you want to skip all packages, modules, and global objects that have a full
+  dotted name that ends with the word "tests", you can use
+  ``ignore=[re.compile('tests$').search]``.
 
 Here's an example of how we might use the ``ignore`` argument to ``scan`` to
 ignore an entire package (and any of its submodules and subpackages) by
@@ -513,8 +514,8 @@ ignore a particular class object:
    scanner.scan(theapp, ignore=['theapp.package.MyClass'])
 
 Here's an example of how we might use the ``ignore`` argument to ``scan`` to
-ignore any module, package, or global object that has a name which begins
-with the string ``test``:
+ignore any module, package, or global object that has a name which ends
+with the string ``tests``:
 
 .. code-block:: python
    :linenos:
@@ -522,14 +523,15 @@ with the string ``test``:
    import re
    import venusian
    scanner = venusian.Scanner()
-   scanner.scan(theapp, ignore=[re.compile('test').match])
+   scanner.scan(theapp, ignore=[re.compile('tests$').search])
 
 You can mix and match the three types in the list.  For example,
 ``scanner.scan(my, ignore=['my.package', '.someothermodule',
-re.compile('test').match])`` would cause ``my.package`` (and all its
+re.compile('tests$').search])`` would cause ``my.package`` (and all its
 submodules and subobjects) to be ignored, ``my.someothermodule`` to be
 ignored, and any modules, packages, or global objects found during the scan
-that start with the name ``test`` to be ignored beneath the ``my`` package.
+that have a full dotted path that ends with the word ``tests`` to be ignored
+beneath the ``my`` package.
 
 Packages and modules matched by any ignore in the list will not be imported,
 and their top-level code will not be run as a result.

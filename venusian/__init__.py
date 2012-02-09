@@ -48,11 +48,11 @@ class Scanner(object):
 
         .. note:: the ``onerror`` callback is new as of Venusian 1.0.
 
-        ``ignore`` allows you to ignore certain modules, packages, or global
-        objects during a scan.  It should be a sequence containing strings
-        and/or callables that will be used to match against the full dotted
-        name of each object encountered during a scan.  The sequence can
-        contain any of these three types of objects:
+        The ``ignore`` argument allows you to ignore certain modules,
+        packages, or global objects during a scan.  It should be a sequence
+        containing strings and/or callables that will be used to match
+        against the full dotted name of each object encountered during a
+        scan.  The sequence can contain any of these three types of objects:
 
         - A string representing a full dotted name.  To name an object by
           dotted name, use a string representing the full dotted name.  For
@@ -71,10 +71,10 @@ class Scanner(object):
         - A callable that accepts a full dotted name string of an object as
           its single positional argument and returns ``True`` or ``False``.
           For example, if you want to skip all packages, modules, and global
-          objects beginning with the word "test", you can use
-          ``ignore=[re.compile('test').match]``.  If the callable returns
-          ``True`` (or anything else truthy), the object is ignored, if it
-          returns ``False`` (or anything else falsy) the object is not
+          objects with a full dotted path that ends with the word "tests", you
+          can use ``ignore=[re.compile('tests$').search]``.  If the callable
+          returns ``True`` (or anything else truthy), the object is ignored,
+          if it returns ``False`` (or anything else falsy) the object is not
           ignored.  *Note that unlike string matches, ignores that use a
           callable don't cause submodules and subobjects of a module or
           package represented by a dotted name to also be ignored, they match
@@ -84,13 +84,17 @@ class Scanner(object):
         You can mix and match the three types of strings in the list.  For
         example, if the package being scanned is ``my``,
         ``ignore=['my.package', '.someothermodule',
-        re.compile('test').match]`` would cause ``my.package`` (and all its
-        submodules and subobjects) to be ignored, ``my.someothermodule`` to
-        be ignored, and any modules, packages, or global objects found during
-        the scan that start with the name ``test`` to be ignored.
+        re.compile('tests$').search]`` would cause ``my.package`` (and all
+        its submodules and subobjects) to be ignored, ``my.someothermodule``
+        to be ignored, and any modules, packages, or global objects found
+        during the scan that have a full dotted name that ends with the word
+        ``tests`` to be ignored.
 
         Note that packages and modules matched by any ignore in the list will
         not be imported, and their top-level code will not be run as a result.
+
+        A string or callable alone can also be passed as ``ignore`` without a
+        surrounding list.
         
         .. note:: the ``ignore`` argument is new as of Venusian 1.1.
         """

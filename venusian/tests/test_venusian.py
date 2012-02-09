@@ -1,6 +1,6 @@
 import unittest
 import sys
-
+import re
 
 class Test(object):
     def __init__(self):
@@ -319,6 +319,67 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[2]['ob'], inst1)
         self.assertEqual(test.registrations[2]['instance'], True)
 
+    def test_ignore_by_full_dotted_name2(self):
+        from venusian.tests.fixtures import nested
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(
+            nested, 
+            ignore=['venusian.tests.fixtures.nested.sub1']
+            )
+        self.assertEqual(len(test.registrations), 3)
+        from venusian.tests.fixtures.nested import function as func1
+        from venusian.tests.fixtures.nested.sub2 import function as func2
+        from venusian.tests.fixtures.nested.sub2.subsub2 import function as func3
+
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func2)
+        self.assertEqual(test.registrations[1]['function'], True)
+
+        self.assertEqual(test.registrations[2]['name'], 'function')
+        self.assertEqual(test.registrations[2]['ob'], func3)
+        self.assertEqual(test.registrations[2]['function'], True)
+
+    def test_ignore_by_full_dotted_name3(self):
+        from venusian.tests.fixtures import nested
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(
+            nested, 
+            ignore=['venusian.tests.fixtures.nested.sub1',
+                    'venusian.tests.fixtures.nested.sub2']
+            )
+        self.assertEqual(len(test.registrations), 1)
+        from venusian.tests.fixtures.nested import function as func1
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+    def test_ignore_by_full_dotted_name4(self):
+        from venusian.tests.fixtures import nested
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(
+            nested, 
+            ignore=['venusian.tests.fixtures.nested.sub1',
+                    'venusian.tests.fixtures.nested.function']
+            )
+        self.assertEqual(len(test.registrations), 2)
+        from venusian.tests.fixtures.nested.sub2 import function as func2
+        from venusian.tests.fixtures.nested.sub2.subsub2 import function as func3
+
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func2)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func3)
+        self.assertEqual(test.registrations[1]['function'], True)
+
     def test_ignore_by_relative_dotted_name(self):
         from venusian.tests.fixtures import one
         test = Test()
@@ -341,8 +402,66 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[2]['ob'], inst1)
         self.assertEqual(test.registrations[2]['instance'], True)
         
+    def test_ignore_by_relative_dotted_name2(self):
+        from venusian.tests.fixtures import nested
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(
+            nested, 
+            ignore=['.sub1']
+            )
+        self.assertEqual(len(test.registrations), 3)
+        from venusian.tests.fixtures.nested import function as func1
+        from venusian.tests.fixtures.nested.sub2 import function as func2
+        from venusian.tests.fixtures.nested.sub2.subsub2 import function as func3
+
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func2)
+        self.assertEqual(test.registrations[1]['function'], True)
+
+        self.assertEqual(test.registrations[2]['name'], 'function')
+        self.assertEqual(test.registrations[2]['ob'], func3)
+        self.assertEqual(test.registrations[2]['function'], True)
+
+    def test_ignore_by_relative_dotted_name3(self):
+        from venusian.tests.fixtures import nested
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(
+            nested, 
+            ignore=['.sub1', '.sub2']
+            )
+        self.assertEqual(len(test.registrations), 1)
+        from venusian.tests.fixtures.nested import function as func1
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func1)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+    def test_ignore_by_relative_dotted_name4(self):
+        from venusian.tests.fixtures import nested
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(
+            nested, 
+            ignore=['.sub1', '.function']
+            )
+        self.assertEqual(len(test.registrations), 2)
+        from venusian.tests.fixtures.nested.sub2 import function as func2
+        from venusian.tests.fixtures.nested.sub2.subsub2 import function as func3
+
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func2)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func3)
+        self.assertEqual(test.registrations[1]['function'], True)
+
     def test_ignore_by_function(self):
-        import re
         from venusian.tests.fixtures import one
         test = Test()
         scanner = self._makeOne(test=test)
@@ -360,6 +479,39 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[1]['ob'], func2)
         self.assertEqual(test.registrations[1]['function'], True)
 
+    def test_ignore_by_function_nested(self):
+        from venusian.tests.fixtures import nested
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(
+            nested, 
+            ignore=[re.compile('.function$').search]
+            )
+        self.assertEqual(len(test.registrations), 0)
+
+    def test_ignore_by_function_nested2(self):
+        from venusian.tests.fixtures import nested
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(
+            nested, 
+            ignore=[re.compile('sub2$').search,
+                    re.compile('nested.function$').search]
+            )
+        self.assertEqual(len(test.registrations), 2)
+
+        from venusian.tests.fixtures.nested.sub1 import function as func2
+        from venusian.tests.fixtures.nested.sub1.subsub1 import function as func3
+
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], func2)
+        self.assertEqual(test.registrations[0]['function'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func3)
+        self.assertEqual(test.registrations[1]['function'], True)
+        
+        
     def test_ignore_as_string(self):
         from venusian.tests.fixtures import one
         test = Test()
