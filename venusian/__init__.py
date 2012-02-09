@@ -96,7 +96,7 @@ class Scanner(object):
         A string or callable alone can also be passed as ``ignore`` without a
         surrounding list.
         
-        .. note:: the ``ignore`` argument is new as of Venusian 1.1.
+        .. note:: the ``ignore`` argument is new as of Venusian 1.0a3.
         """
 
         pkg_name = package.__name__

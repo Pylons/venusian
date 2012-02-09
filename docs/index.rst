@@ -536,7 +536,7 @@ beneath the ``my`` package.
 Packages and modules matched by any ignore in the list will not be imported,
 and their top-level code will not be run as a result.
 
-.. note:: the ``ignore`` argument is new as of Venusian 1.1.
+.. note:: the ``ignore`` argument is new as of Venusian 1.0a3.
 
 
 Limitations and Audience
