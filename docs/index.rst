@@ -437,7 +437,7 @@ imported due to an exception.
 ``ignore`` Scan Argument
 ------------------------
 
-The ``ignore`` to ``ccan`` allows you to ignore certain modules, packages, or
+The ``ignore`` to ``scan`` allows you to ignore certain modules, packages, or
 global objects during a scan.  It should be a sequence containing strings
 and/or callables that will be used to match against the full dotted name of
 each object encountered during the scanning process.  If the ignore value you
