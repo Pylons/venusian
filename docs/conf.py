@@ -71,13 +71,13 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'venusian'
-copyright = '2011 Pylons Project <pylons-discuss@googlegroups.com>'
+copyright = '2012 Pylons Project <pylons-discuss@googlegroups.com>'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.0a3'
+version = '1.0a4'
 # The full version, including alpha/beta/rc tags.
 release = version
 
