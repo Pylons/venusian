@@ -7,4 +7,4 @@ class) decorator is executed at import time, you can defer the action
 usually taken by the decorator until a separate "scan" phase.
 
 See the "docs" directory of the package or the online documentation at
-http://docs.pylonsproject.org/projects/venusian/dev/ .
+http://docs.pylonsproject.org/projects/venusian/en/latest/
