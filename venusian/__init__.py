@@ -1,5 +1,5 @@
 import imp
-from inspect import getmembers
+from inspect import getmembers, getmodule
 import sys
 
 from venusian.compat import iter_modules
@@ -125,6 +125,23 @@ class Scanner(object):
         seen = set()
 
         def invoke(mod_name, name, ob):
+            try:
+                obmodule = getmodule(ob)
+            except NameError: # pragma: no cover
+                # work around bug in virtualenv integration on Python 3.
+                # symptom: 
+                #
+                # File "/venv/lib/python3.2/site.py", line 425, in __setup
+                #    fp = file(filename, "rU")
+                # NameError: global name 'file' is not defined
+                obmodule = None
+
+            if obmodule is not None:
+                if getattr(obmodule, '__name__', None) != mod_name:
+                    # avoid processing objects that were imported into this
+                    # module but were not actually defined here
+                    return
+
             # in one scan, we only process each object once
             if id(ob) in seen:
                 return

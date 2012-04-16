@@ -1,6 +1,27 @@
 Change Log
 ==========
 
+Next release
+------------
+
+- Attempt to ignore objects during scanning that are only imported into a
+  module but not actually defined there.  This is a semantics change, but
+  it's the right thing to do, because I found myself facing a situation like
+  this::
+
+    # in a module named "one"
+
+    from two import anotheradecoratedthing
+    @adecorator
+    def adecoratedthing(): pass
+
+    # and scanning both modules
+    scan('one')
+    scan('two')
+
+  In this case you'd wind up with two repeated registrations for
+  "anotherdecoratedthing", which isn't what anyone expects.
+
 1.0a3 (2012-02-08)
 ------------------
 

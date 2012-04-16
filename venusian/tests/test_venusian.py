@@ -105,6 +105,19 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[2]['ob'], inst1)
         self.assertEqual(test.registrations[2]['instance'], True)
 
+    def test_ignore_imported(self):
+        # even though "twofunction" is imported into "one", it should not
+        # be registered, because it's only imported in one and not defined
+        # there
+        from venusian.tests.fixtures.importonly import one
+        from venusian.tests.fixtures.importonly import two
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(one)
+        self.assertEqual(len(test.registrations), 1)
+        scanner.scan(two)
+        self.assertEqual(len(test.registrations), 2)
+
     def test_one_category(self):
         from venusian.tests.fixtures import category
         test = Test()
