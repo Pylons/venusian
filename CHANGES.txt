@@ -4,6 +4,15 @@ Change Log
 Next release
 ------------
 
+- Slightly less sucky way to ignore objects during scanning that are only
+  imported into a module but not actually defined there.  See 1.0a4 change
+  notes for rationale.  Now instead of checking whether the module of the
+  *scanned object* matches the module being scanned, we check whether the
+  module of the *Venusian attachment* matches the module being scanned.  This
+  allows some genuine uses of imported objects as Venusian scan targets while
+  preventing inappropriate double-scanning of objects that have a venusian
+  attachment which just happen to be imported into other scanned modules.
+
 - Add ``dev`` and ``docs`` setup.py commands (ala Pyramid).
 
 1.0a4 (2012-04-16)

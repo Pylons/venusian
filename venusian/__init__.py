@@ -1,5 +1,5 @@
 import imp
-from inspect import getmembers, getmodule
+from inspect import getmembers
 import sys
 
 from venusian.compat import iter_modules
@@ -125,23 +125,6 @@ class Scanner(object):
         seen = set()
 
         def invoke(mod_name, name, ob):
-            try:
-                obmodule = getmodule(ob)
-            except NameError: # pragma: no cover
-                # work around bug in virtualenv integration on Python 3.
-                # symptom: 
-                #
-                # File "/venv/lib/python3.2/site.py", line 425, in __setup
-                #    fp = file(filename, "rU")
-                # NameError: global name 'file' is not defined
-                obmodule = None
-
-            if obmodule is not None:
-                if getattr(obmodule, '__name__', None) != mod_name:
-                    # avoid processing objects that were imported into this
-                    # module but were not actually defined here
-                    return
-
             # in one scan, we only process each object once
             if id(ob) in seen:
                 return
@@ -180,7 +163,11 @@ class Scanner(object):
                 category_keys.sort()
             for category in category_keys:
                 callbacks = attached_categories.get(category, [])
-                for callback in callbacks:
+                for callback, callback_mod_name in callbacks:
+                    if callback_mod_name != mod_name:
+                        # avoid processing objects that were imported into this
+                        # module but were not actually defined there
+                        continue
                     callback(self, name, ob)
 
         for name, ob in getmembers(package):
@@ -280,11 +267,12 @@ def attach(wrapped, callback, category=None, depth=1):
 
     frame = sys._getframe(depth+1)
     scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
+    module_name = getattr(module, '__name__', None)
     if scope == 'class':
         # we're in the midst of a class statement
         categories = f_locals.setdefault(ATTACH_ATTR, Categories(None))
         callbacks = categories.setdefault(category, [])
-        callbacks.append(callback)
+        callbacks.append((callback, module_name))
     else:
         categories = getattr(wrapped, ATTACH_ATTR, None)
         if categories is None or not categories.attached_to(wrapped):
@@ -293,7 +281,7 @@ def attach(wrapped, callback, category=None, depth=1):
             categories = Categories(wrapped)
             setattr(wrapped, ATTACH_ATTR, categories)
         callbacks = categories.setdefault(category, [])
-        callbacks.append(callback)
+        callbacks.append((callback, module_name))
     return AttachInfo(
         scope=scope, module=module, locals=f_locals, globals=f_globals,
         category=category, codeinfo=codeinfo)
