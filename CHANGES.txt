@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-Next release
-------------
+1.0a5 (2012-04-21)
+------------------
 
 - Slightly less sucky way to ignore objects during scanning that are only
   imported into a module but not actually defined there.  See 1.0a4 change
