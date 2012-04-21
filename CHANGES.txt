@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Next release
+------------
+
+- Add ``dev`` and ``docs`` setup.py commands (ala Pyramid).
+
 1.0a4 (2012-04-16)
 ------------------
 

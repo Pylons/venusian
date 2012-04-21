@@ -26,7 +26,8 @@ except:
     README = ''
     CHANGES = ''
 
-requires = []
+tests_extras = ['nose', 'coverage']
+docs_extras = ['Sphinx', 'repoze.sphinx.autointerface']
 
 setup(name='venusian',
       version='1.0a4',
@@ -54,8 +55,12 @@ setup(name='venusian',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      tests_require = requires,
-      install_requires = requires,
+      extras_require = {
+          'testing':tests_extras,
+          'docs':docs_extras,
+          },
+      tests_require = [],
+      install_requires = [],
       # Normal "setup.py test" can't support running the venusian tests under
       # py 2.4 or 2.5; when it scans the 'classdecorators' fixture, it
       # barfs.  We can't depend on nose in setup_requires here because folks use
