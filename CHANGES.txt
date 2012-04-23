@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Next release
+------------
+
+- Don't ignore decorated objects within their original locations if they
+  happen to be imported into another module (remove ``seen`` set from invoke
+  in venusian scanning).  See https://github.com/Pylons/venusian/pull/13 .
+
 1.0a5 (2012-04-21)
 ------------------
 

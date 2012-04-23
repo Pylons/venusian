@@ -1,7 +1,7 @@
-from .decorators import decoone
+from venusian.tests.fixtures import decorator
 from .two import twofunction # should not be scanned
 
-@decoone(function=True)
+@decorator(function=True)
 def onefunction(request): # pragma: no cover
     twofunction(request)
     return request

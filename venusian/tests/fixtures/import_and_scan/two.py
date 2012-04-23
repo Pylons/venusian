@@ -1,5 +1,5 @@
-from .decorators import decotwo
+from venusian.tests.fixtures import decorator
 
-@decotwo(function=True)
+@decorator(function=True)
 def twofunction(request): # pragma: no cover
     return request

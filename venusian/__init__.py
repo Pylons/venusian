@@ -122,13 +122,7 @@ class Scanner(object):
                             return True
             return False
 
-        seen = set()
-
         def invoke(mod_name, name, ob):
-            # in one scan, we only process each object once
-            if id(ob) in seen:
-                return
-            seen.add(id(ob))
 
             fullname = mod_name + '.' + name
 
