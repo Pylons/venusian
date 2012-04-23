@@ -118,6 +118,15 @@ class TestScanner(unittest.TestCase):
         scanner.scan(two)
         self.assertEqual(len(test.registrations), 2)
 
+    def test_dont_ignore_legit_decorators(self):
+        # make sure venusian picks up other decorated things from
+        # imported modules when the whole package is scanned
+        from venusian.tests.fixtures import import_and_scan
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(import_and_scan)
+        self.assertEqual(len(test.registrations), 2)
+
     def test_one_category(self):
         from venusian.tests.fixtures import category
         test = Test()
