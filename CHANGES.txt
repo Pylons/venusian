@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-Next release
-------------
+1.0a6 (2012-04-23)
+------------------
 
 - Don't ignore decorated objects within their original locations if they
   happen to be imported into another module (remove ``seen`` set from invoke
