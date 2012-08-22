@@ -26,7 +26,7 @@ except:
     README = ''
     CHANGES = ''
 
-tests_extras = ['nose', 'coverage']
+tests_extras = ['nose', 'nose-exclude', 'coverage']
 docs_extras = ['Sphinx', 'repoze.sphinx.autointerface']
 
 setup(name='venusian',
@@ -43,6 +43,7 @@ setup(name='venusian',
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Programming Language :: Python :: Implementation :: Jython",

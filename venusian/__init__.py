@@ -178,7 +178,15 @@ class Scanner(object):
                 loader = importer.find_module(modname)
                 if loader is not None: # happens on pypy with orphaned pyc
                     try:
-                        module_type = loader.etc[2]
+                        if hasattr(loader, 'etc'):
+                            # python < py3.3
+                            module_type = loader.etc[2]
+                        else:
+                            # py3.3b2+ (importlib-using)
+                            module_type = imp.PY_SOURCE
+                            fn = loader.get_filename()
+                            if fn.endswith(('.pyc', '.pyo')):
+                                module_type = imp.PY_COMPILED
                         # only scrape members from non-orphaned source files
                         # and package directories
                         if module_type in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
