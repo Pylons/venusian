@@ -7,6 +7,10 @@ Next release
   we don't get errors resulting from import of fixture code during
   "nosetests".
 
+- Bug fix: no longer suppress ``ImportError`` while scanning by default.  If
+  you want to suppress ``ImportError`` while scanning, you'll now need use an
+  ``onerror`` callback as described in the documentation.
+
 1.0a6 (2012-04-23)
 ------------------
 

@@ -302,11 +302,10 @@ def walk_packages(path=None, prefix='', onerror=None, ignore=None):
     modules!) on the given path, in order to access the __path__
     attribute to find submodules.
 
-    'onerror' is a function which gets called with one argument (the
-    name of the package which was being imported) if any exception
-    occurs while trying to import a package.  If no onerror function is
-    supplied, ImportErrors are caught and ignored, while all other
-    exceptions are propagated, terminating the search.
+    'onerror' is a function which gets called with one argument (the name of
+    the package which was being imported) if any exception occurs while
+    trying to import a package.  If no onerror function is supplied, any
+    exception is exceptions propagated, terminating the search.
 
     'ignore' is a function fed a fullly dotted name; if it returns True, the
     object is skipped and not returned in results (and if it's a package it's
@@ -342,9 +341,6 @@ def walk_packages(path=None, prefix='', onerror=None, ignore=None):
         if ispkg:
             try:
                 __import__(name)
-            except ImportError:
-                if onerror is not None:
-                    onerror(name)
             except Exception:
                 if onerror is not None:
                     onerror(name)
