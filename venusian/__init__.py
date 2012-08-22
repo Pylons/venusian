@@ -181,7 +181,7 @@ class Scanner(object):
                         if hasattr(loader, 'etc'):
                             # python < py3.3
                             module_type = loader.etc[2]
-                        else:
+                        else: # pragma: no cover
                             # py3.3b2+ (importlib-using)
                             module_type = imp.PY_SOURCE
                             fn = loader.get_filename()

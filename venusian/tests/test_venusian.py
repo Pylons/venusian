@@ -575,7 +575,7 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[1]['ob'], func1)
         self.assertEqual(test.registrations[1]['function'], True)
 
-def md(name):
+def md(name): # pragma: no cover
     if name in sys.modules:
         del sys.modules[name]
     

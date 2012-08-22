@@ -1,5 +1,11 @@
-Change Log
-==========
+Next release
+------------
+
+- Venusian now works on Python 3.3b2+ (importlib-based).
+
+- Use nose-exclude instead of relying on fragile module-scope code to ensure
+  we don't get errors resulting from import of fixture code during
+  "nosetests".
 
 1.0a6 (2012-04-23)
 ------------------
