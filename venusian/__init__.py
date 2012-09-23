@@ -353,7 +353,7 @@ def walk_packages(path=None, prefix='', onerror=None, ignore=None):
                 # don't traverse path items we've seen before
                 path = [p for p in path if not seen(p)]
 
-                for item in walk_packages(path, name+'.', onerror):
+                for item in walk_packages(path, name+'.', onerror, ignore):
                     yield item
         else:
             yield importer, name, ispkg
