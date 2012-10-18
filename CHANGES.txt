@@ -5,6 +5,8 @@ Next release
   ignore functions will ignore things recursively.  See
   https://github.com/Pylons/venusian/pull/16
 
+- Don't run tox tests under Python 2.4 anymore (tox no longer supports 2.4).
+
 1.0a7 (2012-08-25)
 ------------------
 
