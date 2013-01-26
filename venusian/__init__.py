@@ -46,7 +46,8 @@ class Scanner(object):
         The ``name`` passed to ``onerror`` is the module or package dotted
         name that could not be imported due to an exception.
 
-        .. note:: the ``onerror`` callback is new as of Venusian 1.0.
+        .. versionadded:: 1.0
+           the ``onerror`` callback
 
         The ``ignore`` argument allows you to ignore certain modules,
         packages, or global objects during a scan.  It should be a sequence
@@ -96,7 +97,8 @@ class Scanner(object):
         A string or callable alone can also be passed as ``ignore`` without a
         surrounding list.
         
-        .. note:: the ``ignore`` argument is new as of Venusian 1.0a3.
+        .. versionadded:: 1.0a3
+           the ``ignore`` argument
         """
 
         pkg_name = package.__name__

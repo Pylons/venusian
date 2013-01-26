@@ -399,6 +399,8 @@ all Venusian callbacks during a scan regardless of their category.
 ``onerror`` Scan Callback
 -------------------------
 
+.. versionadded:: 1.0
+
 By default, when Venusian scans a package, it will propagate all exceptions
 raised while attempting to import code.  You can use an ``onerror`` callback
 argument to :meth:`venusian.Scanner.scan` to change this behavior.
@@ -432,10 +434,11 @@ exception is to be propagated, otherwise it can simply return.  The ``name``
 passed to ``onerror`` is the module or package dotted name that could not be
 imported due to an exception.
 
-.. note:: the ``onerror`` callback is new as of Venusian 1.0.
 
 ``ignore`` Scan Argument
 ------------------------
+
+.. versionadded:: 1.0a3
 
 The ``ignore`` to ``scan`` allows you to ignore certain modules, packages, or
 global objects during a scan.  It should be a sequence containing strings
@@ -535,8 +538,6 @@ beneath the ``my`` package.
 
 Packages and modules matched by any ignore in the list will not be imported,
 and their top-level code will not be run as a result.
-
-.. note:: the ``ignore`` argument is new as of Venusian 1.0a3.
 
 
 Limitations and Audience
