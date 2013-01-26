@@ -12,7 +12,9 @@
 # All configuration values have a default value; values that are commented
 # out serve to show the default value.
 
-import sys, os
+import sys
+import os
+import datetime
 
 # Add and use Pylons theme
 if 'sphinx-build' in ' '.join(sys.argv): # protect against dumb importers
@@ -71,7 +73,8 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'venusian'
-copyright = '2012 Pylons Project <pylons-discuss@googlegroups.com>'
+year = datetime.datetime.now().year
+copyright = '2012-%s Pylons Project <pylons-discuss@googlegroups.com>' % year
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
