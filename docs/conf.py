@@ -80,7 +80,7 @@ copyright = '2012-%s Pylons Project <pylons-discuss@googlegroups.com>' % year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.0a7'
+version = '1.0a8'
 # The full version, including alpha/beta/rc tags.
 release = version
 

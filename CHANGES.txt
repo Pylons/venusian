@@ -1,5 +1,5 @@
-Next release
-------------
+1.0a8 (2013-04-15)
+------------------
 
 - Pass ``ignore`` argument along recursively to ``walk_packages`` so custom
   ignore functions will ignore things recursively.  See
