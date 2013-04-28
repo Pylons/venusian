@@ -315,7 +315,7 @@ we'll pass to our scanner's constructor:
        def add(self, name, ob):
           self.registered.append((name, ob))
 
-   register = Register()
+   registry = Registry()
    scanner = venusian.Scanner(registry=registry)
    scanner.scan(theapp)
 
