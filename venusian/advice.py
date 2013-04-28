@@ -53,12 +53,13 @@ def getFrameInfo(frame):
     frameinfo = inspect.getframeinfo(frame)
     try:
         sourceline = frameinfo[3][0].strip()
-    except: # dont understand circumstance here, 3rdparty code without comment
+    except: #pragma NO COVER
+        # dont understand circumstance here, 3rdparty code without comment
         sourceline = frameinfo[3]
 
     codeinfo = frameinfo[0], frameinfo[1], frameinfo[2], sourceline
 
-    if not namespaceIsModule:
+    if not namespaceIsModule: #pragma no COVER
         # some kind of funky exec
         kind = "exec" # don't know how to repeat this scenario
     elif sameNamespace and not hasModule:
@@ -67,7 +68,7 @@ def getFrameInfo(frame):
         kind = "class"
     elif not sameNamespace:
         kind = "function call"
-    else:
+    else: #pragma NO COVER
         # How can you have f_locals is f_globals, and have '__module__' set?
         # This is probably module-level code, but with a '__module__' variable.
         kind = "unknown"
