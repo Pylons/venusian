@@ -1,5 +1,6 @@
 import imp
-from inspect import getmembers
+from inspect import getmembers, getmro, isclass
+    
 import sys
 
 from venusian.compat import iter_modules
@@ -7,6 +8,7 @@ from venusian.compat import is_nonstr_iter
 from venusian.advice import getFrameInfo
 
 ATTACH_ATTR = '__venusian_callbacks__'
+LIFTONLY_ATTR = '__venusian_liftonly_callbacks__'
 
 class Scanner(object):
     def __init__(self, **kw):
@@ -258,12 +260,13 @@ class Categories(dict):
             self.attached_id = None
         else:
             self.attached_id = id(attached_to)
+        self.lifted = False
 
     def attached_to(self, obj):
         if self.attached_id:
             return self.attached_id == id(obj)
         return True
-    
+
 def attach(wrapped, callback, category=None, depth=1):
     """ Attach a callback to the wrapped object.  It will be found
     later during a scan.  This function returns an instance of the
@@ -272,11 +275,11 @@ def attach(wrapped, callback, category=None, depth=1):
     frame = sys._getframe(depth+1)
     scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
     module_name = getattr(module, '__name__', None)
+    
     if scope == 'class':
         # we're in the midst of a class statement
         categories = f_locals.setdefault(ATTACH_ATTR, Categories(None))
         callbacks = categories.setdefault(category, [])
-        callbacks.append((callback, module_name))
     else:
         categories = getattr(wrapped, ATTACH_ATTR, None)
         if categories is None or not categories.attached_to(wrapped):
@@ -285,10 +288,17 @@ def attach(wrapped, callback, category=None, depth=1):
             categories = Categories(wrapped)
             setattr(wrapped, ATTACH_ATTR, categories)
         callbacks = categories.setdefault(category, [])
-        callbacks.append((callback, module_name))
+
+    callbacks.append((callback, module_name))
+
     return AttachInfo(
-        scope=scope, module=module, locals=f_locals, globals=f_globals,
-        category=category, codeinfo=codeinfo)
+        scope=scope,
+        module=module,
+        locals=f_locals,
+        globals=f_globals,
+        category=category,
+        codeinfo=codeinfo,
+        )
 
 def walk_packages(path=None, prefix='', onerror=None, ignore=None):
     """Yields (module_loader, name, ispkg) for all modules recursively
@@ -359,3 +369,53 @@ def walk_packages(path=None, prefix='', onerror=None, ignore=None):
                     yield item
         else:
             yield importer, name, ispkg
+
+class lift(object):
+    def __init__(self, categories=None):
+        self.categories = categories
+
+    def __call__(self, wrapped):
+        if not isclass(wrapped):
+            raise RuntimeError(
+                '"lift" only works as a class decorator; you tried to use '
+                'it against %r' % wrapped
+                )
+        newcategories = Categories(wrapped)
+        newcategories.lifted = True
+        for cls in getmro(wrapped):
+            attached_categories = cls.__dict__.get(ATTACH_ATTR, None)
+            if attached_categories is None:
+                attached_categories = cls.__dict__.get(LIFTONLY_ATTR, None)
+            if attached_categories is not None:
+                for cname, category in attached_categories.items():
+                    if self.categories and not cname in self.categories:
+                        continue
+                    callbacks = newcategories.get(cname, [])
+                    newcategory = list(callbacks) + list(category)
+                    newcategories[cname] = newcategory
+                if attached_categories.lifted:
+                    break
+        if newcategories: # if it has any keys
+            setattr(wrapped, ATTACH_ATTR, newcategories)
+        return wrapped
+        
+class onlyliftedfrom(object):
+    def __init__(self, categories=None):
+        self.categories = categories
+
+    def __call__(self, wrapped):
+        if not isclass(wrapped):
+            raise RuntimeError(
+                '"onlyliftedfrom" only works as a class decorator; you tried '
+                'to use it against %r' % wrapped
+                )
+        attached_categories = getattr(wrapped, ATTACH_ATTR, None)
+        if ( attached_categories is None or
+             not attached_categories.attached_to(wrapped) ):
+            # we either have no categories or our categories are defined
+            # in a superclass
+            return
+        delattr(wrapped, ATTACH_ATTR)
+        setattr(wrapped, LIFTONLY_ATTR, attached_categories)
+        return wrapped
+        
