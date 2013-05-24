@@ -380,6 +380,9 @@ class lift(object):
                 '"lift" only works as a class decorator; you tried to use '
                 'it against %r' % wrapped
                 )
+        frame = sys._getframe(1)
+        scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
+        module_name = getattr(module, '__name__', None)
         newcategories = Categories(wrapped)
         newcategories.lifted = True
         for cls in getmro(wrapped):
@@ -391,7 +394,8 @@ class lift(object):
                     if self.categories and not cname in self.categories:
                         continue
                     callbacks = newcategories.get(cname, [])
-                    newcategory = list(callbacks) + list(category)
+                    newcallbacks = [ (cb, module_name) for cb, _ in category ]
+                    newcategory = list(callbacks) + newcallbacks
                     newcategories[cname] = newcategory
                 if attached_categories.lifted:
                     break
