@@ -1,11 +1,6 @@
-from venusian import lift, onlyliftedfrom
+from venusian import lift
 from venusian.tests.fixtures import decorator
 
-@onlyliftedfrom()
-class NoDefinitions(object):
-    pass
-
-@onlyliftedfrom()
 class Super1(object): # pragma: no cover
     @decorator()
     def classname(self): pass
@@ -16,9 +11,12 @@ class Super1(object): # pragma: no cover
     @decorator()
     def ram(self): pass
 
+    @decorator()
     def jump(self): pass
 
-class Super2(object): # pragma: no cover
+@lift()
+class Super2(Super1): # pragma: no cover
+    @decorator()
     def boo(self): pass
 
     @decorator()
@@ -28,9 +26,11 @@ class Super2(object): # pragma: no cover
     def jump(self): pass
         
 @lift()
-class Sub(Super1, Super2): # pragma: no cover
+class Sub(Super2): # pragma: no cover
+    @decorator()
     def boo(self): pass
 
+    @decorator()
     def hiss(self): pass
     
     @decorator()

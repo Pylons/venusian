@@ -704,6 +704,112 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[7]['attr'], 'jump')
         self.assertEqual(test.registrations[7]['name'], 'Super2')
         self.assertEqual(test.registrations[7]['ob'], lifting3.Super2)
+
+    def test_lifting4(self):
+        from venusian.tests.fixtures import lifting4
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(lifting4)
+        test.registrations.sort(
+            key=lambda x: (x['name'], x['attr'], x['ob'].__module__)
+            )
+        self.assertEqual(len(test.registrations), 2)
+
+        self.assertEqual(test.registrations[0]['attr'], 'hiss')
+        self.assertEqual(test.registrations[0]['name'], 'Sub')
+        self.assertEqual(test.registrations[0]['ob'], lifting4.Sub)
+
+        self.assertEqual(test.registrations[1]['attr'], 'smack')
+        self.assertEqual(test.registrations[1]['name'], 'Sub')
+        self.assertEqual(test.registrations[1]['ob'], lifting4.Sub)
+
+    def test_lifting5(self):
+        from venusian.tests.fixtures import lifting5
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(lifting5)
+        test.registrations.sort(
+            key=lambda x: (x['name'], x['attr'], x['ob'].__module__)
+            )
+        self.assertEqual(len(test.registrations), 15)
+
+        self.assertEqual(test.registrations[0]['attr'], 'boo')
+        self.assertEqual(test.registrations[0]['name'], 'Sub')
+        self.assertEqual(test.registrations[0]['ob'], lifting5.Sub)
+
+        self.assertEqual(test.registrations[1]['attr'], 'classname')
+        self.assertEqual(test.registrations[1]['name'], 'Sub')
+        self.assertEqual(test.registrations[1]['ob'], lifting5.Sub)
+
+        self.assertEqual(test.registrations[2]['attr'], 'hiss')
+        self.assertEqual(test.registrations[2]['name'], 'Sub')
+        self.assertEqual(test.registrations[2]['ob'], lifting5.Sub)
+
+        self.assertEqual(test.registrations[3]['attr'], 'jump')
+        self.assertEqual(test.registrations[3]['name'], 'Sub')
+        self.assertEqual(test.registrations[3]['ob'], lifting5.Sub)
+
+        self.assertEqual(test.registrations[4]['attr'], 'ram')
+        self.assertEqual(test.registrations[4]['name'], 'Sub')
+        self.assertEqual(test.registrations[4]['ob'], lifting5.Sub)
+
+        self.assertEqual(test.registrations[5]['attr'], 'smack')
+        self.assertEqual(test.registrations[5]['name'], 'Sub')
+        self.assertEqual(test.registrations[5]['ob'], lifting5.Sub)
+
+        self.assertEqual(test.registrations[6]['attr'], 'boo')
+        self.assertEqual(test.registrations[6]['name'], 'Super1')
+        self.assertEqual(test.registrations[6]['ob'], lifting5.Super1)
+
+        self.assertEqual(test.registrations[7]['attr'], 'classname')
+        self.assertEqual(test.registrations[7]['name'], 'Super1')
+        self.assertEqual(test.registrations[7]['ob'], lifting5.Super1)
+
+        self.assertEqual(test.registrations[8]['attr'], 'jump')
+        self.assertEqual(test.registrations[8]['name'], 'Super1')
+        self.assertEqual(test.registrations[8]['ob'], lifting5.Super1)
+        
+        self.assertEqual(test.registrations[9]['attr'], 'ram')
+        self.assertEqual(test.registrations[9]['name'], 'Super1')
+        self.assertEqual(test.registrations[9]['ob'], lifting5.Super1)
+
+        self.assertEqual(test.registrations[10]['attr'], 'boo')
+        self.assertEqual(test.registrations[10]['name'], 'Super2')
+        self.assertEqual(test.registrations[10]['ob'], lifting5.Super2)
+
+        self.assertEqual(test.registrations[11]['attr'], 'classname')
+        self.assertEqual(test.registrations[11]['name'], 'Super2')
+        self.assertEqual(test.registrations[11]['ob'], lifting5.Super2)
+
+        self.assertEqual(test.registrations[12]['attr'], 'hiss')
+        self.assertEqual(test.registrations[12]['name'], 'Super2')
+        self.assertEqual(test.registrations[12]['ob'], lifting5.Super2)
+
+        self.assertEqual(test.registrations[13]['attr'], 'jump')
+        self.assertEqual(test.registrations[13]['name'], 'Super2')
+        self.assertEqual(test.registrations[13]['ob'], lifting5.Super2)
+
+        self.assertEqual(test.registrations[14]['attr'], 'ram')
+        self.assertEqual(test.registrations[14]['name'], 'Super2')
+        self.assertEqual(test.registrations[14]['ob'], lifting5.Super2)
+        
+class Test_lift(unittest.TestCase):
+    def _makeOne(self, categories=None):
+        from venusian import lift
+        return lift(categories)
+
+    def test_not_class(self):
+        inst = self._makeOne()
+        self.assertRaises(RuntimeError, inst, None)
+
+class Test_onlyliftedfrom(unittest.TestCase):
+    def _makeOne(self):
+        from venusian import onlyliftedfrom
+        return onlyliftedfrom()
+
+    def test_not_class(self):
+        inst = self._makeOne()
+        self.assertRaises(RuntimeError, inst, None)
         
 def md(name): # pragma: no cover
     if name in sys.modules:

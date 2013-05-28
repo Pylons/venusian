@@ -161,8 +161,8 @@ class Scanner(object):
                 category_keys.sort()
             for category in category_keys:
                 callbacks = attached_categories.get(category, [])
-                for callback, callback_mod_name in callbacks:
-                    if callback_mod_name != mod_name:
+                for callback, cb_mod_name, identifier, scope in callbacks:
+                    if cb_mod_name != mod_name:
                         # avoid processing objects that were imported into this
                         # module but were not actually defined there
                         continue
@@ -267,7 +267,7 @@ class Categories(dict):
             return self.attached_id == id(obj)
         return True
 
-def attach(wrapped, callback, category=None, depth=1):
+def attach(wrapped, callback, category=None, depth=1, name=None):
     """ Attach a callback to the wrapped object.  It will be found
     later during a scan.  This function returns an instance of the
     :class:`venusian.AttachInfo` class."""
@@ -275,6 +275,9 @@ def attach(wrapped, callback, category=None, depth=1):
     frame = sys._getframe(depth+1)
     scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
     module_name = getattr(module, '__name__', None)
+    wrapped_name = getattr(wrapped, '__name__', None)
+
+    identifier = '%s %s' % (wrapped_name, name)
     
     if scope == 'class':
         # we're in the midst of a class statement
@@ -289,7 +292,7 @@ def attach(wrapped, callback, category=None, depth=1):
             setattr(wrapped, ATTACH_ATTR, categories)
         callbacks = categories.setdefault(category, [])
 
-    callbacks.append((callback, module_name))
+    callbacks.append((callback, module_name, identifier, scope))
 
     return AttachInfo(
         scope=scope,
@@ -391,10 +394,20 @@ class lift(object):
                 attached_categories = cls.__dict__.get(LIFTONLY_ATTR, None)
             if attached_categories is not None:
                 for cname, category in attached_categories.items():
-                    if self.categories and not cname in self.categories:
-                        continue
+                    if cls is not wrapped:
+                        if self.categories and not cname in self.categories:
+                            continue
                     callbacks = newcategories.get(cname, [])
-                    newcallbacks = [ (cb, module_name) for cb, _ in category ]
+                    newcallbacks = []
+                    for cb, _, identifier, cscope in category:
+                        append = True
+                        toappend = (cb, module_name, identifier, cscope)
+                        if cscope == 'class':
+                            for ncb, _, nid, nscope in callbacks:
+                                if (nscope == 'class' and nid == identifier):
+                                    append = False
+                        if append:
+                            newcallbacks.append(toappend)
                     newcategory = list(callbacks) + newcallbacks
                     newcategories[cname] = newcategory
                 if attached_categories.lifted:
@@ -404,9 +417,6 @@ class lift(object):
         return wrapped
         
 class onlyliftedfrom(object):
-    def __init__(self, categories=None):
-        self.categories = categories
-
     def __call__(self, wrapped):
         if not isclass(wrapped):
             raise RuntimeError(
