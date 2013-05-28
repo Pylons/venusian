@@ -270,7 +270,15 @@ class Categories(dict):
 def attach(wrapped, callback, category=None, depth=1, name=None):
     """ Attach a callback to the wrapped object.  It will be found
     later during a scan.  This function returns an instance of the
-    :class:`venusian.AttachInfo` class."""
+    :class:`venusian.AttachInfo` class.
+
+    ``category`` should be ``None`` or a string representing a decorator
+    category name.
+
+    ``name`` should be ``None`` or a string representing a subcategory within
+    the category.  This will be used by the ``lift`` class decorator to
+    determine if decorations of a method should be inherited or overridden.
+    """
 
     frame = sys._getframe(depth+1)
     scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
@@ -373,7 +381,69 @@ def walk_packages(path=None, prefix='', onerror=None, ignore=None):
         else:
             yield importer, name, ispkg
 
+
 class lift(object):
+    """
+    A class decorator which 'lifts' superclass venusian configuration
+    decorations into subclasses.  For example::
+
+      from venusian import lift
+      from somepackage import venusian_decorator
+
+      class Super(object):
+          @venusian_decorator()
+          def boo(self): pass
+
+          @venusian_decorator()
+          def hiss(self): pass
+
+          @venusian_decorator()
+          def jump(self): pass
+              
+      @lift()
+      class Sub(Super):
+          def boo(self): pass
+
+          def hiss(self): pass
+          
+          @venusian_decorator()
+          def smack(self): pass
+
+    The above configuration will cause the callbacks of seven venusian
+    decorators.  The ones attached to Super.boo, Super.hiss, and Super.jump
+    *plus* ones attached to Sub.boo, Sub.hiss, Sub.hump and Sub.smack.
+
+    If a subclass overrides a decorator on a method, its superclass decorators
+    will be ignored for the subclass.  That means that in this configuration:
+
+      from venusian import lift
+      from somepackage import venusian_decorator
+
+      class Super(object):
+          @venusian_decorator()
+          def boo(self): pass
+
+          @venusian_decorator()
+          def hiss(self): pass
+
+      @lift()
+      class Sub(Super):
+
+          def boo(self): pass
+          
+          @venusian_decorator()
+          def hiss(self): pass
+
+    Only four, not five decorator callbacks will be run: the ones attached to
+    Super.boo and Super.hiss, the inherited one of Sub.boo and the
+    non-inherited one of Sub.hiss.  The inherited decorator on Super.hiss will
+    be ignored for the subclass.
+
+    The ``lift`` decorator takes a single argument named 'categories'.  If
+    supplied, it should be a tuple of category names.  Only decorators
+    in this category will be lifted if it is suppled.
+          
+    """
     def __init__(self, categories=None):
         self.categories = categories
 
@@ -417,6 +487,36 @@ class lift(object):
         return wrapped
         
 class onlyliftedfrom(object):
+    """
+    A class decorator which marks a class as 'only lifted from'.  Decorations
+    made on methods of the class won't have their callbacks called directly,
+    but classes which inherit from only-lifted-from classes which also use the
+    ``lift`` class decorator will use the superclass decoration callbacks.
+
+    For example::
+    
+      from venusian import lift, onlyliftedfrom
+      from somepackage import venusian_decorator
+
+      @onlyliftedfrom()
+      class Super(object):
+          @venusian_decorator()
+          def boo(self): pass
+
+          @venusian_decorator()
+          def hiss(self): pass
+
+      @lift()
+      class Sub(Super):
+
+          def boo(self): pass
+          
+          def hiss(self): pass
+
+    Only two decorator callbacks will be run: the ones attached to Sub.boo and
+    Sub.hiss.  The inherited decorators on Super.boo and Super.hiss will be
+    not be registered.
+    """
     def __call__(self, wrapped):
         if not isclass(wrapped):
             raise RuntimeError(

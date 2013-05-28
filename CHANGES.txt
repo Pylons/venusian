@@ -3,6 +3,10 @@
 
 - Drop support of Python 2.4 / 2.5 / Jython.
 
+- Add ``lift`` and ``onlyliftedfrom`` class decorators to allow for inheritance
+  of venusian decorators attached to superclass methods.  See the API
+  documentation for more information.
+
 1.0a8 (2013-04-15)
 ------------------
 
