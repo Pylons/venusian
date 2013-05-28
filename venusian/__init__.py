@@ -161,7 +161,7 @@ class Scanner(object):
                 category_keys.sort()
             for category in category_keys:
                 callbacks = attached_categories.get(category, [])
-                for callback, cb_mod_name, identifier, scope in callbacks:
+                for callback, cb_mod_name, liftid, scope in callbacks:
                     if cb_mod_name != mod_name:
                         # avoid processing objects that were imported into this
                         # module but were not actually defined there
@@ -277,7 +277,7 @@ def attach(wrapped, callback, category=None, depth=1, name=None):
     module_name = getattr(module, '__name__', None)
     wrapped_name = getattr(wrapped, '__name__', None)
 
-    identifier = '%s %s' % (wrapped_name, name)
+    liftid = '%s %s' % (wrapped_name, name)
     
     if scope == 'class':
         # we're in the midst of a class statement
@@ -292,7 +292,7 @@ def attach(wrapped, callback, category=None, depth=1, name=None):
             setattr(wrapped, ATTACH_ATTR, categories)
         callbacks = categories.setdefault(category, [])
 
-    callbacks.append((callback, module_name, identifier, scope))
+    callbacks.append((callback, module_name, liftid, scope))
 
     return AttachInfo(
         scope=scope,
@@ -399,12 +399,12 @@ class lift(object):
                             continue
                     callbacks = newcategories.get(cname, [])
                     newcallbacks = []
-                    for cb, _, identifier, cscope in category:
+                    for cb, _, liftid, cscope in category:
                         append = True
-                        toappend = (cb, module_name, identifier, cscope)
+                        toappend = (cb, module_name, liftid, cscope)
                         if cscope == 'class':
-                            for ncb, _, nid, nscope in callbacks:
-                                if (nscope == 'class' and nid == identifier):
+                            for ncb, _, nliftid, nscope in callbacks:
+                                if (nscope == 'class' and liftid == nliftid):
                                     append = False
                         if append:
                             newcallbacks.append(toappend)
