@@ -152,7 +152,7 @@ class Scanner(object):
                 # catchall except: return here, which in any other case would
                 # be high treason.
                 attached_categories = getattr(ob, ATTACH_ATTR)
-                if not attached_categories.attached_to(ob):
+                if not attached_categories.attached_to((mod_name, name)):
                     return
             except:
                 return
@@ -254,17 +254,14 @@ class AttachInfo(object):
         self.__dict__.update(kw)
 
 class Categories(dict):
-    def __init__(self, attached_to):
+    def __init__(self, val):
         super(dict, self).__init__()
-        if attached_to is None:
-            self.attached_id = None
-        else:
-            self.attached_id = id(attached_to)
+        self.attached_id = val
         self.lifted = False
 
-    def attached_to(self, obj):
+    def attached_to(self, val):
         if self.attached_id:
-            return self.attached_id == id(obj)
+            return self.attached_id == val
         return True
 
 def attach(wrapped, callback, category=None, depth=1, name=None):
@@ -284,19 +281,29 @@ def attach(wrapped, callback, category=None, depth=1, name=None):
     scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
     module_name = getattr(module, '__name__', None)
     wrapped_name = getattr(wrapped, '__name__', None)
+    class_name = codeinfo[2]
 
     liftid = '%s %s' % (wrapped_name, name)
-    
+
     if scope == 'class':
         # we're in the midst of a class statement
-        categories = f_locals.setdefault(ATTACH_ATTR, Categories(None))
+        categories = f_locals.get(ATTACH_ATTR, None)
+        if categories is None or not categories.attached_to(
+            (module_name, class_name)
+            ):
+            # if there aren't any attached categories, or we've retrieved
+            # some by inheritance, we need to create new ones
+            categories = Categories((module_name, class_name))
+            f_locals[ATTACH_ATTR] = categories
         callbacks = categories.setdefault(category, [])
     else:
         categories = getattr(wrapped, ATTACH_ATTR, None)
-        if categories is None or not categories.attached_to(wrapped):
+        if categories is None or not categories.attached_to(
+            (module_name, wrapped_name)
+            ):
             # if there aren't any attached categories, or we've retrieved
             # some by inheritance, we need to create new ones
-            categories = Categories(wrapped)
+            categories = Categories((module_name, wrapped_name))
             setattr(wrapped, ATTACH_ATTR, categories)
         callbacks = categories.setdefault(category, [])
 
@@ -456,7 +463,8 @@ class lift(object):
         frame = sys._getframe(1)
         scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
         module_name = getattr(module, '__name__', None)
-        newcategories = Categories(wrapped)
+        wrapped_name = getattr(wrapped, '__name__', None)
+        newcategories = Categories((module_name, wrapped_name))
         newcategories.lifted = True
         for cls in getmro(wrapped):
             attached_categories = cls.__dict__.get(ATTACH_ATTR, None)
@@ -523,9 +531,11 @@ class onlyliftedfrom(object):
                 '"onlyliftedfrom" only works as a class decorator; you tried '
                 'to use it against %r' % wrapped
                 )
+        mod_name = wrapped.__module__
+        class_name = wrapped.__name__
         attached_categories = getattr(wrapped, ATTACH_ATTR, None)
         if ( attached_categories is None or
-             not attached_categories.attached_to(wrapped) ):
+             not attached_categories.attached_to((mod_name, class_name)) ):
             # we either have no categories or our categories are defined
             # in a superclass
             return
