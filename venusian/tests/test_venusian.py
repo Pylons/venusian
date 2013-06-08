@@ -792,6 +792,24 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[14]['attr'], 'ram')
         self.assertEqual(test.registrations[14]['name'], 'Super2')
         self.assertEqual(test.registrations[14]['ob'], lifting5.Super2)
+
+    def test_subclassing(self):
+        from venusian.tests.fixtures import subclassing
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(subclassing)
+        test.registrations.sort(
+            key=lambda x: (x['name'], x['attr'], x['ob'].__module__)
+            )
+        self.assertEqual(len(test.registrations), 2)
+        
+        self.assertEqual(test.registrations[0]['attr'], 'boo')
+        self.assertEqual(test.registrations[0]['name'], 'Super')
+        self.assertEqual(test.registrations[0]['ob'], subclassing.Super)
+
+        self.assertEqual(test.registrations[1]['attr'], 'classname')
+        self.assertEqual(test.registrations[1]['name'], 'Super')
+        self.assertEqual(test.registrations[1]['ob'], subclassing.Super)
         
 class Test_lift(unittest.TestCase):
     def _makeOne(self, categories=None):

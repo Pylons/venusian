@@ -7,6 +7,11 @@
   of venusian decorators attached to superclass methods.  See the API
   documentation for more information.
 
+- Fix bug where otherwise undecorated subclass of a superclass that had
+  venusian decorators on it would inherit its superclass' decorations.
+  Venusian decorators should have never been inherited implicitly.  See
+  https://github.com/Pylons/venusian/issues/11#issuecomment-4977352
+
 1.0a8 (2013-04-15)
 ------------------
 
