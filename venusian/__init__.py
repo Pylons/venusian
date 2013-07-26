@@ -161,7 +161,12 @@ class Scanner(object):
                 category_keys.sort()
             for category in category_keys:
                 callbacks = attached_categories.get(category, [])
-                for callback, cb_mod_name, liftid, scope in callbacks:
+                for maybe_cb in callbacks:
+                    # ignore bad data from objects messing with magic methods
+                    if not hasattr(maybe_cb, '__len__') or len(maybe_cb) != 4:
+                        continue
+                    # otherwise unpack the data
+                    callback, cb_mod_name, liftid, scope = maybe_cb
                     if cb_mod_name != mod_name:
                         # avoid processing objects that were imported into this
                         # module but were not actually defined there
