@@ -12,6 +12,9 @@
   Venusian decorators should have never been inherited implicitly.  See
   https://github.com/Pylons/venusian/issues/11#issuecomment-4977352
 
+- Make scanning more resilient of metaclasses that return proxies for any
+  attribute access.
+
 1.0a8 (2013-04-15)
 ------------------
 
