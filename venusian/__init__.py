@@ -107,111 +107,156 @@ class Scanner(object):
 
         if ignore is not None and not is_nonstr_iter(ignore):
             ignore = [ignore]
-        
+
         def _ignore(fullname):
-            if ignore is not None:
-                for ign in ignore:
-                    if isinstance(ign, str):
-                        if ign.startswith('.'):
-                            # leading dotted name relative to scanned package
-                            if fullname.startswith(pkg_name + ign):
-                                return True
-                        else:
-                            # non-leading-dotted name absolute object name
-                            if fullname.startswith(ign):
-                                return True
-                    else:
-                        # function
-                        if ign(fullname):
-                            return True
-            return False
+            return _is_ignored(fullname, pkg_name, ignore)
 
-        def invoke(mod_name, name, ob):
+        self.scan_module(pkg_name, package, _ignore, categories)
 
-            fullname = mod_name + '.' + name
+        # if not a package, we are done now
+        if not hasattr(package, '__path__'):
+            return
 
-            if _ignore(fullname):
+        results = walk_packages(package.__path__, package.__name__+'.',
+                                onerror=onerror, ignore=_ignore)
+
+        for importer, modname, ispkg in results:
+            loader = importer.find_module(modname)
+            if loader is not None: # happens on pypy with orphaned pyc
+                try:
+                    self._scan_submodule(loader, modname, _ignore,
+                                         categories, onerror)
+                finally:
+                    if  ( hasattr(loader, 'file') and
+                          hasattr(loader.file,'close') ):
+                        loader.file.close()
+
+    def scan_module(self, mod_name, module, ignore, categories):
+       """Invoke Venusian callbacks for a single module.
+
+       The ``mod_name`` argument is the name of the module.
+
+       ``module`` is module object.
+
+       ``ignore`` is a function that is passed the full dotted name
+       of all members of the module. It should return ``True`` if
+       callbacks for that name are not to be invoked.
+
+       ``categories`` is a sequence of category names, or ``None``. Only
+       callbacks in the categories given are invoked. If ``None``, callbacks
+       in all categories are invoked.
+       """
+       for name, ob in getmembers(module, None):
+           self.invoke(mod_name, name, ob, ignore, categories)
+
+    def invoke(self, mod_name, name, ob, ignore, categories):
+        """Invoke Venusian callbacks on object in module.
+
+        The ``mod_name`` argument is the name of the module in
+        which object resides.
+
+        The ``name`` argument is the name of the object within that module.
+
+        The ``ob`` argument is the object (module global) to invoke
+        the callbacks for.
+
+        ``ignore`` is a function that is passed the full dotted name of
+        ``ob``. It should return ``True`` if callbacks of that object
+        are not to be invoked.
+
+        ``categories`` is a sequence of category names, or ``None``. Only
+        callbacks in the categories given are invoked. If ``None``, callbacks
+        in all categories are invoked.
+
+        """
+        fullname = mod_name + '.' + name
+
+        if ignore(fullname):
+            return
+
+        try:
+            # Some metaclasses do insane things when asked for an
+            # ``ATTACH_ATTR``, like not raising an AttributeError but
+            # some other arbitary exception.  Some even shittier
+            # introspected code lets us access ``ATTACH_ATTR`` far but
+            # barfs on a second attribute access for ``attached_to``
+            # (still not raising an AttributeError, but some other
+            # arbitrary exception).  Finally, the shittiest code of all
+            # allows the attribute access of the ``ATTACH_ATTR`` *and*
+            # ``attached_to``, (say, both ``ob.__getattr__`` and
+            # ``attached_categories.__getattr__`` returning a proxy for
+            # any attribute access), which either a) isn't callable or b)
+            # is callable, but, when called, shits its pants in an
+            # potentially arbitrary way (although for b, only TypeError
+            # has been seen in the wild, from PyMongo).  Thus the
+            # catchall except: return here, which in any other case would
+            # be high treason.
+            attached_categories = getattr(ob, ATTACH_ATTR)
+            if not attached_categories.attached_to(mod_name, name, ob):
                 return
+        except:
+            return
+        if categories is None:
+            categories = list(attached_categories.keys())
+            categories.sort()
+        for category in categories:
+            callbacks = attached_categories.get(category, [])
+            for callback, cb_mod_name, liftid, scope in callbacks:
+                if cb_mod_name != mod_name:
+                    # avoid processing objects that were imported into this
+                    # module but were not actually defined there
+                    continue
+                callback(self, name, ob)
 
-            category_keys = categories
-            try:
-                # Some metaclasses do insane things when asked for an
-                # ``ATTACH_ATTR``, like not raising an AttributeError but
-                # some other arbitary exception.  Some even shittier
-                # introspected code lets us access ``ATTACH_ATTR`` far but
-                # barfs on a second attribute access for ``attached_to``
-                # (still not raising an AttributeError, but some other
-                # arbitrary exception).  Finally, the shittiest code of all
-                # allows the attribute access of the ``ATTACH_ATTR`` *and*
-                # ``attached_to``, (say, both ``ob.__getattr__`` and
-                # ``attached_categories.__getattr__`` returning a proxy for
-                # any attribute access), which either a) isn't callable or b)
-                # is callable, but, when called, shits its pants in an
-                # potentially arbitrary way (although for b, only TypeError
-                # has been seen in the wild, from PyMongo).  Thus the
-                # catchall except: return here, which in any other case would
-                # be high treason.
-                attached_categories = getattr(ob, ATTACH_ATTR)
-                if not attached_categories.attached_to(mod_name, name, ob):
-                    return
-            except:
-                return
-            if category_keys is None:
-                category_keys = list(attached_categories.keys())
-                category_keys.sort()
-            for category in category_keys:
-                callbacks = attached_categories.get(category, [])
-                for callback, cb_mod_name, liftid, scope in callbacks:
-                    if cb_mod_name != mod_name:
-                        # avoid processing objects that were imported into this
-                        # module but were not actually defined there
-                        continue
-                    callback(self, name, ob)
+    def _scan_submodule(self, loader, modname, ignore, categories, onerror):
+        if hasattr(loader, 'etc'):
+            # python < py3.3
+            module_type = loader.etc[2]
+        else: # pragma: no cover
+            # py3.3b2+ (importlib-using)
+            module_type = imp.PY_SOURCE
+            fn = loader.get_filename()
+            if fn.endswith(('.pyc', '.pyo', '$py.class')):
+                module_type = imp.PY_COMPILED
+        # only scrape members from non-orphaned source files
+        # and package directories
+        if module_type not in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
+            return
+        # NB: use __import__(modname) rather than
+        # loader.load_module(modname) to prevent
+        # inappropriate double-execution of module code
+        try:
+            __import__(modname)
+        except Exception:
+            if onerror is not None:
+                onerror(modname)
+            else:
+                raise
+        module = sys.modules.get(modname)
+        if module is None:
+            return
+        self.scan_module(modname, module, ignore, categories)
 
-        for name, ob in getmembers(package):
-            # whether it's a module or a package, we need to scan its
-            # members; walk_packages only iterates over submodules and
-            # subpackages
-            invoke(pkg_name, name, ob)
 
-        if hasattr(package, '__path__'): # package, not module
-            results = walk_packages(package.__path__, package.__name__+'.',
-                                    onerror=onerror, ignore=_ignore)
+def _is_ignored(fullname, pkg_name, ignore):
+    if ignore is None:
+        return False
+    for ign in ignore:
+        if isinstance(ign, str):
+            if ign.startswith('.'):
+                # leading dotted name relative to scanned package
+                if fullname.startswith(pkg_name + ign):
+                    return True
+            else:
+                # non-leading-dotted name absolute object name
+                if fullname.startswith(ign):
+                    return True
+        else:
+            # function
+            if ign(fullname):
+                return True
+    return False
 
-            for importer, modname, ispkg in results:
-                loader = importer.find_module(modname)
-                if loader is not None: # happens on pypy with orphaned pyc
-                    try:
-                        if hasattr(loader, 'etc'):
-                            # python < py3.3
-                            module_type = loader.etc[2]
-                        else: # pragma: no cover
-                            # py3.3b2+ (importlib-using)
-                            module_type = imp.PY_SOURCE
-                            fn = loader.get_filename()
-                            if fn.endswith(('.pyc', '.pyo', '$py.class')):
-                                module_type = imp.PY_COMPILED
-                        # only scrape members from non-orphaned source files
-                        # and package directories
-                        if module_type in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
-                            # NB: use __import__(modname) rather than
-                            # loader.load_module(modname) to prevent
-                            # inappropriate double-execution of module code
-                            try:
-                                __import__(modname)
-                            except Exception:
-                                if onerror is not None:
-                                    onerror(modname)
-                                else:
-                                    raise
-                            module = sys.modules.get(modname)
-                            if module is not None:
-                                for name, ob in getmembers(module, None):
-                                    invoke(modname, name, ob)
-                    finally:
-                        if  ( hasattr(loader, 'file') and
-                              hasattr(loader.file,'close') ):
-                            loader.file.close()
 
 class AttachInfo(object):
     """
