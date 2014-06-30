@@ -30,7 +30,7 @@ tests_extras = ['nose', 'nose-exclude', 'coverage']
 docs_extras = ['Sphinx', 'repoze.sphinx.autointerface']
 
 setup(name='venusian',
-      version='1.0a8',
+      version='1.0a8f1',
       description='A library for deferring decorator actions',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
