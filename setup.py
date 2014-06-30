@@ -30,7 +30,7 @@ tests_extras = ['nose', 'nose-exclude', 'coverage']
 docs_extras = ['Sphinx', 'repoze.sphinx.autointerface']
 
 setup(name='venusifork',
-      version='0.1',
+      version='2.0a1',
       description='Fork of the Venusian library for deferring decorator actions',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
