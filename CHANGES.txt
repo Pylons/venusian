@@ -12,6 +12,12 @@
   Venusian decorators should have never been inherited implicitly.  See
   https://github.com/Pylons/venusian/issues/11#issuecomment-4977352
 
+- Add a ``scan_module`` method on the scanner to scan a module
+  non-recursively.
+
+- Add a ``invoke`` method on the scanner to invoke callbacks on an
+  individual object.
+
 1.0a8 (2013-04-15)
 ------------------
 
