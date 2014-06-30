@@ -1,5 +1,5 @@
-1.0a9 (unreleased)
-------------------
+0.1 (2014-06-30)
+----------------
 
 - Drop support of Python 2.4 / 2.5 / Jython.
 
