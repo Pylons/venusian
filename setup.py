@@ -26,7 +26,11 @@ except:
     README = ''
     CHANGES = ''
 
-tests_extras = ['nose', 'nose-exclude', 'coverage']
+tests_extras = [
+    'nose',
+    'nose-exclude<0.2', #  0.2.X has issues under py3
+    'coverage'
+    ]
 docs_extras = ['Sphinx', 'repoze.sphinx.autointerface']
 
 setup(name='venusian',
