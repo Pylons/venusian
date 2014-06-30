@@ -29,8 +29,8 @@ except:
 tests_extras = ['nose', 'nose-exclude', 'coverage']
 docs_extras = ['Sphinx', 'repoze.sphinx.autointerface']
 
-setup(name='venusian',
-      version='1.0a8f1',
+setup(name='venusifork',
+      version='0.1',
       description='A library for deferring decorator actions',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -45,7 +45,7 @@ setup(name='venusian',
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
       ],
-      keywords='web wsgi zope',
+      keywords='web wsgi zope pyramid morepath',
       author="Chris McDonough, Agendaless Consulting",
       author_email="pylons-devel@googlegroups.com",
       url="http://pylonsproject.org",
