@@ -131,7 +131,7 @@ class Scanner(object):
                           hasattr(loader.file,'close') ):
                         loader.file.close()
 
-    def scan_module(self, mod_name, module, ignore, categories):
+    def scan_module(self, mod_name, module, ignore=None, categories=None):
        """Invoke Venusian callbacks for a single module.
 
        The ``mod_name`` argument is the name of the module.
@@ -140,16 +140,16 @@ class Scanner(object):
 
        ``ignore`` is a function that is passed the full dotted name
        of all members of the module. It should return ``True`` if
-       callbacks for that name are not to be invoked.
+       callbacks for that name are not to be invoked. Optional.
 
        ``categories`` is a sequence of category names, or ``None``. Only
        callbacks in the categories given are invoked. If ``None``, callbacks
-       in all categories are invoked.
+       in all categories are invoked. Optional.
        """
        for name, ob in getmembers(module, None):
            self.invoke(mod_name, name, ob, ignore, categories)
 
-    def invoke(self, mod_name, name, ob, ignore, categories):
+    def invoke(self, mod_name, name, ob, ignore=None, categories=None):
         """Invoke Venusian callbacks on object in module.
 
         The ``mod_name`` argument is the name of the module in
@@ -162,16 +162,16 @@ class Scanner(object):
 
         ``ignore`` is a function that is passed the full dotted name of
         ``ob``. It should return ``True`` if callbacks of that object
-        are not to be invoked.
+        are not to be invoked. Optional.
 
         ``categories`` is a sequence of category names, or ``None``. Only
         callbacks in the categories given are invoked. If ``None``, callbacks
-        in all categories are invoked.
+        in all categories are invoked. Optional.
 
         """
         fullname = mod_name + '.' + name
 
-        if ignore(fullname):
+        if ignore is not None and ignore(fullname):
             return
 
         try:
