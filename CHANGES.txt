@@ -1,6 +1,8 @@
 1.0a9 (unreleased)
 ------------------
 
+- Fix an issue under PyPy > 2.0 where attached decorators may not be found.
+
 - Drop support of Python 2.4 / 2.5 / Jython.
 
 - Add ``lift`` and ``onlyliftedfrom`` class decorators to allow for inheritance
