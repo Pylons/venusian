@@ -3,8 +3,12 @@ from inspect import getmembers, getmro, isclass
     
 import sys
 
-from venusian.compat import iter_modules
-from venusian.compat import is_nonstr_iter
+from venusian.compat import (
+    iter_modules,
+    is_nonstr_iter,
+    INT_TYPES,
+    )
+
 from venusian.advice import getFrameInfo
 
 ATTACH_ATTR = '__venusian_callbacks__'
@@ -263,10 +267,9 @@ class Categories(dict):
         self.lifted = False
 
     def attached_to(self, mod_name, name, obj):
-        if isinstance(self.attached_id, (int, long)):
+        if isinstance(self.attached_id, INT_TYPES):
             return self.attached_id == id(obj)
-        else:
-            return self.attached_id == (mod_name, name)
+        return self.attached_id == (mod_name, name)
 
 def attach(wrapped, callback, category=None, depth=1, name=None):
     """ Attach a callback to the wrapped object.  It will be found
