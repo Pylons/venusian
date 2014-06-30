@@ -263,7 +263,7 @@ class Categories(dict):
         self.lifted = False
 
     def attached_to(self, mod_name, name, obj):
-        if isinstance(self.attached_id, int):
+        if isinstance(self.attached_id, (int, long)):
             return self.attached_id == id(obj)
         else:
             return self.attached_id == (mod_name, name)
