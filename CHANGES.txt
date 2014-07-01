@@ -1,11 +1,7 @@
-2.0a2 (unreleased)
-------------------
+1.0 (2014-06-30)
+----------------
 
-- Nothing changed yet.
-
-
-2.0a1 (2014-06-30)
-------------------
+- Fix an issue under PyPy > 2.0 where attached decorators may not be found.
 
 - Drop support of Python 2.4 / 2.5 / Jython.
 

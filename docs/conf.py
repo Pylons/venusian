@@ -15,6 +15,7 @@
 import sys
 import os
 import datetime
+import pkg_resources
 
 # Add and use Pylons theme
 if 'sphinx-build' in ' '.join(sys.argv): # protect against dumb importers
@@ -80,7 +81,7 @@ copyright = '2012-%s Pylons Project <pylons-discuss@googlegroups.com>' % year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.0a8'
+version = pkg_resources.get_distribution('venusian').version
 # The full version, including alpha/beta/rc tags.
 release = version
 
