@@ -81,7 +81,7 @@ copyright = '2012-%s Pylons Project <pylons-discuss@googlegroups.com>' % year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = pkg_resources.get_distribution('pyramid').version
+version = pkg_resources.get_distribution('venusian').version
 # The full version, including alpha/beta/rc tags.
 release = version
 
