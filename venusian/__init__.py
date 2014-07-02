@@ -1,6 +1,5 @@
 import imp
 from inspect import getmembers, getmro, isclass
-    
 import sys
 
 from venusian.compat import (
@@ -18,8 +17,9 @@ class Scanner(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
-    def scan(self, package, categories=None, onerror=None, ignore=None):
-        """ Scan a Python package and any of its subpackages.  All
+    def scan(self, package, categories=None, onerror=None, ignore=None,
+             recursive=True):
+        """Scan a Python package and any of its subpackages.  All
         top-level objects will be considered; those marked with
         venusian callback attributes related to ``category`` will be
         processed.
@@ -102,9 +102,22 @@ class Scanner(object):
 
         A string or callable alone can also be passed as ``ignore`` without a
         surrounding list.
-        
+
         .. versionadded:: 1.0a3
            the ``ignore`` argument
+
+        The ``recursive`` argument allows you to turn off recursive
+        sub-module scanning. Normally when you supply scan with a
+        Python package, it automatically also scans any sub-modules
+        and sub-packages within the packages recursively. You can turn
+        this off by passing in ``recursive=False``. When ``recursive``
+        is set to ``False``, only the ``__init__.py`` of a package is
+        scanned, nothing else. The behavior for scanning non-package
+        modules is unaffected by ``recursive``. By default, recursive
+        is set to ``True``.
+
+        .. versionadded:: 1.1a1
+           the ``recursive`` argument
         """
 
         pkg_name = package.__name__
@@ -115,10 +128,10 @@ class Scanner(object):
         def _ignore(fullname):
             return _is_ignored(fullname, pkg_name, ignore)
 
-        self.scan_module(pkg_name, package, _ignore, categories)
+        self._scan_module(pkg_name, package, _ignore, categories)
 
-        # if not a package, we are done now
-        if not hasattr(package, '__path__'):
+        # if not a package or recursive is disabled, we are done now
+        if not recursive or not hasattr(package, '__path__'):
             return
 
         results = walk_packages(package.__path__, package.__name__+'.',
@@ -135,7 +148,7 @@ class Scanner(object):
                           hasattr(loader.file,'close') ):
                         loader.file.close()
 
-    def scan_module(self, mod_name, module, ignore=None, categories=None):
+    def _scan_module(self, mod_name, module, ignore=None, categories=None):
        """Invoke Venusian callbacks for a single module.
 
        The ``mod_name`` argument is the name of the module.
@@ -151,9 +164,9 @@ class Scanner(object):
        in all categories are invoked. Optional.
        """
        for name, ob in getmembers(module, None):
-           self.invoke(mod_name, name, ob, ignore, categories)
+           self._invoke(mod_name, name, ob, ignore, categories)
 
-    def invoke(self, mod_name, name, ob, ignore=None, categories=None):
+    def _invoke(self, mod_name, name, ob, ignore=None, categories=None):
         """Invoke Venusian callbacks on object in module.
 
         The ``mod_name`` argument is the name of the module in
@@ -239,7 +252,7 @@ class Scanner(object):
         module = sys.modules.get(modname)
         if module is None:
             return
-        self.scan_module(modname, module, ignore, categories)
+        self._scan_module(modname, module, ignore, categories)
 
 
 def _is_ignored(fullname, pkg_name, ignore):

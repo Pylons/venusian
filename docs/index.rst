@@ -540,6 +540,24 @@ beneath the ``my`` package.
 Packages and modules matched by any ignore in the list will not be imported,
 and their top-level code will not be run as a result.
 
+``recursive`` Scan Argument
+---------------------------
+
+Normally when you ``scan()`` a Python package, it not only scans its
+``__init__.py`` but also scans any sub-module and sub-package in this
+package. You can turn off this behavior by providing a ``recursive=False``
+argument to scan:
+
+.. code-block:: python
+   :linenos:
+
+   import venusian
+   scanner = venusian.Scanner()
+   scanner.scan(mypackage, recursive=False)
+
+When ``recursive`` is set to ``False``, only the ``__init__.py`` of a
+package is scanned. The behavior for modules that are not packages
+remains unaffected, as modules do not have any sub-modules.
 
 Limitations and Audience
 ------------------------
