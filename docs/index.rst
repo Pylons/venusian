@@ -543,6 +543,8 @@ and their top-level code will not be run as a result.
 ``recursive`` Scan Argument
 ---------------------------
 
+.. versionadded:: 1.1a1
+
 Normally when you ``scan()`` a Python package, it not only scans its
 ``__init__.py`` but also scans any sub-module and sub-package in this
 package. You can turn off this behavior by providing a ``recursive=False``
