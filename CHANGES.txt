@@ -1,11 +1,11 @@
-1.1 (unreleased)
-----------------
+1.1a1 (unreleased)
+------------------
 
-- Add a ``scan_module`` method on the scanner to scan a module
-  non-recursively.
+- Add a ``recursive`` option to the ``.scan()`` method to allow the
+  scanning of packages non-recursively (scan ``__init__.py`` only).
 
-- Add a ``invoke`` method on the scanner to invoke attached Venusian
-  callbacks on an individual object.
+- Some refactoring of internals from nested functions into separate
+  methods.
 
 1.0 (2014-06-30)
 ----------------
