@@ -1,5 +1,9 @@
-1.1a1 (unreleased)
+2.0a2 (unreleased)
 ------------------
+
+- **NOTE** This will hopefully be in Venusian proper in Version 1.1;
+  this fork is just so I can make progress with the new ``recursive``
+  option.
 
 - Add a ``recursive`` option to the ``.scan()`` method to allow the
   scanning of packages non-recursively (scan ``__init__.py`` only).
