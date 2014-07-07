@@ -33,8 +33,8 @@ tests_extras = [
     ]
 docs_extras = ['Sphinx', 'repoze.sphinx.autointerface']
 
-setup(name='venusifork',
-      version='2.0a2',
+setup(name='venusian',
+      version='1.0',
       description='A library for deferring decorator actions',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
