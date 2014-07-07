@@ -13,4 +13,4 @@ API Documentation for Venusian
 
   .. autoclass:: lift
 
-  .. auutoclass:: onlyliftedfrom
+  .. autoclass:: onlyliftedfrom

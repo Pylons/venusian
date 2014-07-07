@@ -51,6 +51,68 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[5]['ob'], inst2)
         self.assertEqual(test.registrations[5]['instance'], True)
 
+    def test_scan_non_recursive_module(self):
+        from venusian.tests.fixtures.one import module
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(module, recursive=False)
+        self.assertEqual(len(test.registrations), 3)
+        from venusian.tests.fixtures.one.module import function as func1
+        from venusian.tests.fixtures.one.module import inst as inst1
+        from venusian.tests.fixtures.one.module import Class as Class1
+
+        self.assertEqual(test.registrations[0]['name'], 'Class')
+        self.assertEqual(test.registrations[0]['ob'], Class1)
+        self.assertEqual(test.registrations[0]['method'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func1)
+        self.assertEqual(test.registrations[1]['function'], True)
+
+        self.assertEqual(test.registrations[2]['name'], 'inst')
+        self.assertEqual(test.registrations[2]['ob'], inst1)
+        self.assertEqual(test.registrations[2]['instance'], True)
+
+    def test_scan_non_recursive_with_ignore(self):
+        from venusian.tests.fixtures.one import module
+        test = Test()
+        scanner = self._makeOne(test=test)
+        def ignore_func(name):
+            return name == 'venusian.tests.fixtures.one.module.inst'
+
+        scanner.scan(module, ignore=ignore_func, recursive=False)
+        self.assertEqual(len(test.registrations), 2)
+        from venusian.tests.fixtures.one.module import function as func1
+        from venusian.tests.fixtures.one.module import Class as Class1
+
+        self.assertEqual(test.registrations[0]['name'], 'Class')
+        self.assertEqual(test.registrations[0]['ob'], Class1)
+        self.assertEqual(test.registrations[0]['method'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], func1)
+        self.assertEqual(test.registrations[1]['function'], True)
+
+    def test_scan_non_recursive_package_init_empty(self):
+        from venusian.tests.fixtures import one
+        test = Test()
+        scanner = self._makeOne(test=test)
+
+        scanner.scan(one, recursive=False)
+        self.assertEqual(len(test.registrations), 0)
+
+    def test_scan_non_recursive_package_init(self):
+        from venusian.tests.fixtures import subpackages
+        from venusian.tests.fixtures.subpackages import function
+
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(subpackages, recursive=False)
+        self.assertEqual(len(test.registrations), 1)
+        self.assertEqual(test.registrations[0]['name'], 'function')
+        self.assertEqual(test.registrations[0]['ob'], function)
+        self.assertEqual(test.registrations[0]['function'], True)
+
     def test_package_with_orphaned_pyc_file(self):
         # There is a module2.pyc file in the "pycfixtures" package; it
         # has no corresponding .py source file.  Such orphaned .pyc

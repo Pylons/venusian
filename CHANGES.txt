@@ -1,3 +1,12 @@
+1.1a1 (unreleased)
+------------------
+
+- Add a ``recursive`` option to the ``.scan()`` method to allow the
+  scanning of packages non-recursively (scan ``__init__.py`` only).
+
+- Some refactoring of internals from nested functions into separate
+  methods.
+
 1.0 (2014-06-30)
 ----------------
 
