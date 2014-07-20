@@ -1,3 +1,9 @@
+Next release
+------------
+
+- Micro-optimization when ignores are used (see
+  https://github.com/Pylons/venusian/pull/20).
+
 1.0 (2014-06-30)
 ----------------
 
