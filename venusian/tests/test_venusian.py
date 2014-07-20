@@ -575,6 +575,16 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[1]['ob'], func1)
         self.assertEqual(test.registrations[1]['function'], True)
 
+    def test_ignore_mixed_string_abs_rel_and_func(self):
+        import re
+        from venusian.tests.fixtures import one
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(one, ignore=['venusian.tests.fixtures.one.module2',
+                                  '.module',
+                                  re.compile('inst').search])
+        self.assertEqual(len(test.registrations), 0)
+
     def test_lifting1(self):
         from venusian.tests.fixtures import lifting1
         test = Test()

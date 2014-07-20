@@ -115,17 +115,19 @@ class Scanner(object):
             ignore = []
 
         # non-leading-dotted name absolute object name
-        string_ignores = [ign for ign in ignore if isinstance(ign, str)]
+        str_ignores = [ign for ign in ignore if isinstance(ign, str)]
         # leading dotted name relative to scanned package
-        relative_ignores = [ign for ign in string_ignores if ign.startswith('.')]
+        rel_ignores = [ign for ign in str_ignores if ign.startswith('.')]
+        # non-leading dotted names
+        abs_ignores = [ign for ign in str_ignores if not ign.startswith('.')]
         # functions, e.g. re.compile('pattern').search
         callable_ignores = [ign for ign in ignore if callable(ign)]
         
         def _ignore(fullname):
-            for ign in relative_ignores:
+            for ign in rel_ignores:
                 if fullname.startswith(pkg_name + ign):
                     return True
-            for ign in string_ignores:
+            for ign in abs_ignores:
                 # non-leading-dotted name absolute object name
                 if fullname.startswith(ign):
                     return True
