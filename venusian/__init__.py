@@ -111,24 +111,29 @@ class Scanner(object):
 
         if ignore is not None and not is_nonstr_iter(ignore):
             ignore = [ignore]
+        elif ignore is None:
+            ignore = []
+
+        # non-leading-dotted name absolute object name
+        string_ignores = [ign for ign in ignore if isinstance(ign, str)]
+        # leading dotted name relative to scanned package
+        relative_ignores = [ign for ign in string_ignores if ign.startswith('.')]
+        # functions, e.g. re.compile('pattern').search
+        callable_ignores = [ign for ign in ignore if callable(ign)]
         
         def _ignore(fullname):
-            if ignore is not None:
-                for ign in ignore:
-                    if isinstance(ign, str):
-                        if ign.startswith('.'):
-                            # leading dotted name relative to scanned package
-                            if fullname.startswith(pkg_name + ign):
-                                return True
-                        else:
-                            # non-leading-dotted name absolute object name
-                            if fullname.startswith(ign):
-                                return True
-                    else:
-                        # function
-                        if ign(fullname):
-                            return True
+            for ign in relative_ignores:
+                if fullname.startswith(pkg_name + ign):
+                    return True
+            for ign in string_ignores:
+                # non-leading-dotted name absolute object name
+                if fullname.startswith(ign):
+                    return True
+            for ign in callable_ignores:
+                if ign(fullname):
+                    return True
             return False
+
 
         def invoke(mod_name, name, ob):
 
