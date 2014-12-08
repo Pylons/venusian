@@ -311,7 +311,7 @@ def attach(wrapped, callback, category=None, depth=1, name=None):
     else:
         categories = getattr(wrapped, ATTACH_ATTR, None)
         if categories is None or not categories.attached_to(
-            module_name, class_name, wrapped
+            module_name, wrapped_name, wrapped
             ):
             # if there aren't any attached categories, or we've retrieved
             # some by inheritance, we need to create new ones
