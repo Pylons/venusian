@@ -251,6 +251,21 @@ class TestScanner(unittest.TestCase):
                             classdecorator.SuperClass)
         self.assertEqual(test.registrations[1]['superclass'], True)
 
+    def test_class_and_method_decorator(self):
+        from venusian.tests.fixtures import class_and_method
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(class_and_method)
+        self.assertEqual(len(test.registrations), 2)
+        self.assertEqual(test.registrations[0]['name'], 'Class')
+        self.assertEqual(test.registrations[0]['ob'],
+                         class_and_method.Class)
+        self.assertEqual(test.registrations[0]['method'], True)
+        self.assertEqual(test.registrations[1]['name'], 'Class')
+        self.assertEqual(test.registrations[1]['ob'],
+                         class_and_method.Class)
+        self.assertEqual(test.registrations[1]['class_'], True)
+
     def test_scan_only_finds_classdecoration_once(self):
         from venusian.tests.fixtures import two
         from venusian.tests.fixtures.two.mod1 import Class
