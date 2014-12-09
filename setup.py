@@ -20,8 +20,10 @@ from setuptools import find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 
 try:
-    README = open(os.path.join(here, 'README.txt')).read()
-    CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+    with open(os.path.join(here, 'README.rst')) as f:
+        README = f.read()
+    with open(os.path.join(here, 'CHANGES.rst')) as f:
+        CHANGES = f.read()
 except:
     README = ''
     CHANGES = ''
@@ -59,19 +61,12 @@ setup(name='venusian',
       include_package_data=True,
       zip_safe=False,
       extras_require = {
-          'testing':tests_extras,
-          'docs':docs_extras,
+          'testing': tests_extras,
+          'docs': docs_extras,
       },
       tests_require = [],
       install_requires = [],
-      # Normal "setup.py test" can't support running the venusian tests under
-      # py 2.4 or 2.5; when it scans the 'classdecorators' fixture, it
-      # barfs.  We can't depend on nose in setup_requires here because folks use
-      # this under "pip bundle" which does not support setup_requires.
-      # So you just have to know to install nose and run "setup.py nosetests"
-      # rather than setup.py test.
       test_suite='venusian',
       entry_points = """\
       """
       )
-
