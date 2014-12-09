@@ -1,10 +1,9 @@
 import imp
 from inspect import getmembers, getmro, isclass
-    
+from pkgutil import iter_modules
 import sys
 
 from venusian.compat import (
-    iter_modules,
     is_nonstr_iter,
     INT_TYPES,
     )

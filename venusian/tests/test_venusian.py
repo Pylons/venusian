@@ -163,44 +163,42 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[1]['ob'], category.function2)
         self.assertEqual(test.registrations[1]['function'], True)
 
-    if sys.version_info >= (2, 6):
+    def test_decorations_arent_inherited(self):
+        from venusian.tests.fixtures import inheritance
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(inheritance)
+        self.assertEqual(test.registrations, [
+            dict(name='Parent',
+                    ob=inheritance.Parent),
+            ])
 
-        def test_decorations_arent_inherited(self):
-            from venusian.tests.fixtures import inheritance
-            test = Test()
-            scanner = self._makeOne(test=test)
-            scanner.scan(inheritance)
-            self.assertEqual(test.registrations, [
-                dict(name='Parent',
-                     ob=inheritance.Parent),
-                ])
+    def test_classdecorator(self):
+        from venusian.tests.fixtures import classdecorator
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(classdecorator)
+        test.registrations.sort(key=lambda x: (x['name'], x['ob'].__module__))
+        self.assertEqual(len(test.registrations), 2)
+        self.assertEqual(test.registrations[0]['name'], 'SubClass')
+        self.assertEqual(test.registrations[0]['ob'],
+                            classdecorator.SubClass)
+        self.assertEqual(test.registrations[0]['subclass'], True)
+        self.assertEqual(test.registrations[1]['name'], 'SuperClass')
+        self.assertEqual(test.registrations[1]['ob'],
+                            classdecorator.SuperClass)
+        self.assertEqual(test.registrations[1]['superclass'], True)
 
-        def test_classdecorator(self): # pragma: no cover
-            from venusian.tests.fixtures import classdecorator
-            test = Test()
-            scanner = self._makeOne(test=test)
-            scanner.scan(classdecorator)
-            test.registrations.sort(key=lambda x: (x['name'], x['ob'].__module__))
-            self.assertEqual(len(test.registrations), 2)
-            self.assertEqual(test.registrations[0]['name'], 'SubClass')
-            self.assertEqual(test.registrations[0]['ob'],
-                             classdecorator.SubClass)
-            self.assertEqual(test.registrations[0]['subclass'], True)
-            self.assertEqual(test.registrations[1]['name'], 'SuperClass')
-            self.assertEqual(test.registrations[1]['ob'],
-                             classdecorator.SuperClass)
-            self.assertEqual(test.registrations[1]['superclass'], True)
-
-        def test_scan_only_finds_classdecoration_once(self):
-            from venusian.tests.fixtures import two
-            from venusian.tests.fixtures.two.mod1 import Class
-            test = Test()
-            scanner = self._makeOne(test=test)
-            scanner.scan(two)
-            self.assertEqual(test.registrations, [
-                dict(name='Class',
-                     ob=Class),
-                ])
+    def test_scan_only_finds_classdecoration_once(self):
+        from venusian.tests.fixtures import two
+        from venusian.tests.fixtures.two.mod1 import Class
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(two)
+        self.assertEqual(test.registrations, [
+            dict(name='Class',
+                    ob=Class),
+            ])
             
     def test_importerror_during_scan_default_onerror(self):
         from venusian.tests.fixtures import importerror
