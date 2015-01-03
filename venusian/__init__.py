@@ -198,7 +198,12 @@ class Scanner(object):
                         else: # pragma: no cover
                             # py3.3b2+ (importlib-using)
                             module_type = imp.PY_SOURCE
-                            fn = loader.get_filename()
+                            if hasattr(loader, 'get_filename'):
+                                fn = loader.get_filename()
+                            else:
+                                # On Python 2.6.7, `get_filename` is not there so used `archive` instead
+                                # See https://github.com/Pylons/venusian/issues/19
+                                fn = loader.archive
                             if fn.endswith(('.pyc', '.pyo', '$py.class')):
                                 module_type = imp.PY_COMPILED
                         # only scrape members from non-orphaned source files
