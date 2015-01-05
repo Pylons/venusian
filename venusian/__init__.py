@@ -370,7 +370,9 @@ def walk_packages(path=None, prefix='', onerror=None, ignore=None):
         m[p] = True
 
     # iter_modules is nonrecursive
-    for importer, name, ispkg in iter_modules(path, prefix):
+    # sorted by module name for repeatability
+    for importer, name, ispkg in sorted(iter_modules(path, prefix),
+                                        key=lambda item: item[1]):
 
         if ignore is not None and ignore(name):
             # if name is a package, ignoring here will cause
