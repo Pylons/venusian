@@ -1,6 +1,24 @@
 import unittest
 import sys
 import re
+import os
+import contextlib
+
+
+@contextlib.contextmanager
+def with_entry_in_sys_path(entry):
+    """Context manager that temporarily puts an entry at head of sys.path"""
+    sys.path.insert(0, entry)
+    yield
+    sys.path.remove(entry)
+
+
+def zip_file_in_sys_path():
+    """Context manager that puts zipped.zip at head of sys.path"""
+    zip_pkg_path = os.path.join(os.path.dirname(__file__),
+                                'fixtures', 'zipped.zip')
+    return with_entry_in_sys_path(zip_pkg_path)
+
 
 class Test(object):
     def __init__(self):
@@ -50,6 +68,52 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[5]['name'], 'inst')
         self.assertEqual(test.registrations[5]['ob'], inst2)
         self.assertEqual(test.registrations[5]['instance'], True)
+
+    def test_module_in_zip(self):
+        with zip_file_in_sys_path():
+            import moduleinzip
+        test = Test()
+        scanner = self._makeOne(test=test)
+        scanner.scan(moduleinzip)
+        self.assertEqual(len(test.registrations), 3)
+        test.registrations.sort(key=lambda x: (x['name'], x['ob'].__module__))
+        from venusian.tests.fixtures.one.module import function as func1
+        from venusian.tests.fixtures.one.module2 import function as func2
+        from venusian.tests.fixtures.one.module import inst as inst1
+        from venusian.tests.fixtures.one.module2 import inst as inst2
+        from venusian.tests.fixtures.one.module import Class as Class1
+        from venusian.tests.fixtures.one.module2 import Class as Class2
+
+        self.assertEqual(test.registrations[0]['name'], 'Class')
+        self.assertEqual(test.registrations[0]['ob'], moduleinzip.Class)
+        self.assertEqual(test.registrations[0]['method'], True)
+
+        self.assertEqual(test.registrations[1]['name'], 'function')
+        self.assertEqual(test.registrations[1]['ob'], moduleinzip.function)
+        self.assertEqual(test.registrations[1]['function'], True)
+
+        self.assertEqual(test.registrations[2]['name'], 'inst')
+        self.assertEqual(test.registrations[2]['ob'], moduleinzip.inst)
+        self.assertEqual(test.registrations[2]['instance'], True)
+
+    def test_package_in_zip(self):
+        with zip_file_in_sys_path():
+            import packageinzip
+        test = Test()
+        scanner = self._makeOne(test=test)
+        # The following currently causes:
+        #     TypeError: zipimporter.get_filename() takes exactly 1 argument (0 given)
+        # https://github.com/Pylons/venusian/pull/45 fixes this
+        # On Python < 2.7, it causes an AttributeError, because there is no zipimport.get_filename
+        try:
+            scanner.scan(packageinzip)
+        except TypeError:
+            pass
+        except AttributeError:  # pragma: no cover
+            if sys.version_info < (2, 7):
+                pass
+            else:
+                raise
 
     def test_package_with_orphaned_pyc_file(self):
         # There is a module2.pyc file in the "pycfixtures" package; it
