@@ -107,8 +107,6 @@ class TestScanner(unittest.TestCase):
         # On Python < 2.7, it causes an AttributeError, because there is no zipimport.get_filename
         try:
             scanner.scan(packageinzip)
-        except TypeError:
-            pass
         except AttributeError:  # pragma: no cover
             if sys.version_info < (2, 7):
                 pass
