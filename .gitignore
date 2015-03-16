@@ -19,3 +19,4 @@ venusian/coverage.xml
 docs/_build/
 docs/_themes/
 coverage-py*
+nosetests-py*
