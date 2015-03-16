@@ -198,7 +198,13 @@ class Scanner(object):
                         else: # pragma: no cover
                             # py3.3b2+ (importlib-using)
                             module_type = imp.PY_SOURCE
-                            fn = loader.get_filename()
+                            get_filename = getattr(loader, 'get_filename', None)
+                            if get_filename is None:
+                                get_filename = loader._get_filename
+                            try:
+                                fn = get_filename(modname)
+                            except TypeError:
+                                fn = get_filename()
                             if fn.endswith(('.pyc', '.pyo', '$py.class')):
                                 module_type = imp.PY_COMPILED
                         # only scrape members from non-orphaned source files

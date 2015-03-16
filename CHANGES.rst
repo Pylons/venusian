@@ -1,6 +1,10 @@
 Next release
 ------------
 
+- Support loaders that require the module name as argument to their
+  ``get_filename()`` method. This fixes problems with zipped packages
+  on Python 3.
+
 - Micro-optimization when ignores are used (see
   https://github.com/Pylons/venusian/pull/20).
 
