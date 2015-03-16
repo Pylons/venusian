@@ -8,6 +8,8 @@ Next release
 - Micro-optimization when ignores are used (see
   https://github.com/Pylons/venusian/pull/20).
 
+- A tox run now combines coverage between Py2 and Py3.
+
 1.0 (2014-06-30)
 ----------------
 
