@@ -30,7 +30,7 @@ except:
 
 tests_extras = [
     'nose',
-    'nose-exclude<0.2', #  0.2.X has issues under py3
+    'nose-exclude != 0.2.0, != 0.3.0', #  0.2 ~ 0.3 has issues under py3
     'coverage'
     ]
 docs_extras = ['Sphinx', 'repoze.sphinx.autointerface']
