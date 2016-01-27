@@ -1,0 +1,4 @@
+include *.txt *.rst *.cfg *.py *.ini
+exclude .installed.cfg
+recursive-include venusian *.py
+recursive-include tests *.py
