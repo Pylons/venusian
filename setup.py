@@ -34,7 +34,7 @@ tests_extras = [
 docs_extras = ['Sphinx', 'repoze.sphinx.autointerface']
 
 setup(name='venusifork',
-      version='2.0a3',
+      version='2.0a4.dev0',
       description='A library for deferring decorator actions',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
