@@ -1,4 +1,4 @@
-2.0a3 (unreleased)
+2.0a3 (2016-01-27)
 ------------------
 
 - Do an additional check to avoid scanning modules inserted by ``six``
