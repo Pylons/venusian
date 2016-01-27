@@ -1,3 +1,14 @@
+2.0a3 (unreleased)
+------------------
+
+- Do an additional check to avoid scanning modules inserted by ``six``
+  for Python 3 compatibility. ``six`` assumes these modules exist in
+  Python but some of them, like ``gdbm``, cannot always be compiled,
+  so don't scan these. This hack may actually not be strictly proper
+  as it is possible for an outer module to be ignored while an inner
+  module is allowed by an ``ignore`` function, but we'll not worry
+  about that case for now.
+
 2.0a2 (2014-07-07)
 ------------------
 

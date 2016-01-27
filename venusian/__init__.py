@@ -149,22 +149,29 @@ class Scanner(object):
                         loader.file.close()
 
     def _scan_module(self, mod_name, module, ignore=None, categories=None):
-       """Invoke Venusian callbacks for a single module.
+        """Invoke Venusian callbacks for a single module.
 
-       The ``mod_name`` argument is the name of the module.
+        The ``mod_name`` argument is the name of the module.
 
-       ``module`` is module object.
+        ``module`` is module object.
 
-       ``ignore`` is a function that is passed the full dotted name
-       of all members of the module. It should return ``True`` if
-       callbacks for that name are not to be invoked. Optional.
+        ``ignore`` is a function that is passed the full dotted name
+        of all members of the module. It should return ``True`` if
+        callbacks for that name are not to be invoked. Optional.
 
-       ``categories`` is a sequence of category names, or ``None``. Only
-       callbacks in the categories given are invoked. If ``None``, callbacks
-       in all categories are invoked. Optional.
-       """
-       for name, ob in getmembers(module, None):
-           self._invoke(mod_name, name, ob, ignore, categories)
+        ``categories`` is a sequence of category names, or ``None``. Only
+        callbacks in the categories given are invoked. If ``None``, callbacks
+        in all categories are invoked. Optional.
+        """
+        # in some cases modules that are in the stdlib like gdbm are actually
+        # not compiled. Due to Python 3 compatibility in stuff like
+        # the six library, the gdbm module is still "there", but cannot
+        # be scanned. This way we skip that kind of module
+        #if ignore is not None and ignore(mod_name):
+        #    return
+
+        for name, ob in getmembers(module, None):
+            self._invoke(mod_name, name, ob, ignore, categories)
 
     def _invoke(self, mod_name, name, ob, ignore=None, categories=None):
         """Invoke Venusian callbacks on object in module.
