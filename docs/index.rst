@@ -233,7 +233,7 @@ Here's what happens as a result of invoking the
    module will be inspected to see if it has had a Venusian callback
    attached to it.
 
-#. For every object that *does* have an Venusian callback attached to
+#. For every object that *does* have a Venusian callback attached to
    it, the callback is called.
 
 We could have also passed the ``scan`` method a Python *package*
@@ -479,7 +479,7 @@ The sequence can contain any of these three types of objects:
   it is not ignored.  If the callable matches a package name, the package as
   well as any of that package's submodules and subpackages (recursively) will
   be ignored.  If the callable matches a module name, that module and any of
-  its contained global objects will be ignored.  If the callable mactches a
+  its contained global objects will be ignored.  If the callable matches a
   global object name, only that object name will be ignored.  For example, if
   you want to skip all packages, modules, and global objects that have a full
   dotted name that ends with the word "tests", you can use
