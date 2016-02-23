@@ -5,5 +5,5 @@ from venusian.tests.fixtures import decorator
 class ClassWithMethod(object):
 
     @decorator(method=True)
-    def method_on_class(self):
+    def method_on_class(self): # pragma: no cover
         pass
