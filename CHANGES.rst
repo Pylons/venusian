@@ -1,6 +1,10 @@
 1.1 (unreleased)
 ----------------
 
+- Fix bug where using the same venusian decorator on both a class and its
+  methods would cause the method decorations to be ignored. See
+  https://github.com/Pylons/venusian/issues/40
+
 - Deprecate support for Python 2.6:  it will be removed in the 1.2
   release.
 
