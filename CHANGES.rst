@@ -1,5 +1,11 @@
-Next release
-------------
+1.1 (unreleased)
+----------------
+
+- Deprecate support for Python 2.6:  it will be removed in the 1.2
+  release.
+
+- Drop support for Python 3.2:  it is no longer supported by current
+  packaging / CI tools.
 
 - Support loaders that require the module name as argument to their
   ``get_filename()`` method. This fixes problems with zipped packages
