@@ -36,17 +36,15 @@ tests_extras = [
 docs_extras = ['Sphinx', 'repoze.sphinx.autointerface']
 
 setup(name='venusian',
-      version='1.0',
+      version='1.1-dev0',
       description='A library for deferring decorator actions',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: Implementation :: CPython",
