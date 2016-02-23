@@ -1,6 +1,10 @@
 Next release
 ------------
 
+- Add support for Python 3.5.
+
+- Drop support for Python 2.6, Python 3.2.
+
 - Support loaders that require the module name as argument to their
   ``get_filename()`` method. This fixes problems with zipped packages
   on Python 3.
