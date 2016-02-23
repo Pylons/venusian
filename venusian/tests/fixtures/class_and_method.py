@@ -2,8 +2,8 @@ from venusian.tests.fixtures import decorator
 
 
 @decorator(class_=True)
-class Class(object):
+class ClassWithMethod(object):
 
     @decorator(method=True)
-    def method(self):
+    def method_on_class(self):
         pass

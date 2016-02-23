@@ -257,13 +257,13 @@ class TestScanner(unittest.TestCase):
         scanner = self._makeOne(test=test)
         scanner.scan(class_and_method)
         self.assertEqual(len(test.registrations), 2)
-        self.assertEqual(test.registrations[0]['name'], 'Class')
+        self.assertEqual(test.registrations[0]['name'], 'ClassWithMethod')
         self.assertEqual(test.registrations[0]['ob'],
-                         class_and_method.Class)
+                         class_and_method.ClassWithMethod)
         self.assertEqual(test.registrations[0]['method'], True)
-        self.assertEqual(test.registrations[1]['name'], 'Class')
+        self.assertEqual(test.registrations[1]['name'], 'ClassWithMethod')
         self.assertEqual(test.registrations[1]['ob'],
-                         class_and_method.Class)
+                         class_and_method.ClassWithMethod)
         self.assertEqual(test.registrations[1]['class_'], True)
 
     def test_scan_only_finds_classdecoration_once(self):
