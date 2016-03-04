@@ -168,15 +168,28 @@ class Scanner(object):
                 return
             if category_keys is None:
                 category_keys = list(attached_categories.keys())
-                category_keys.sort()
+                try:
+                    # When metaclasses return proxies for any attribute access
+                    # the list may contain keys of different types which might
+                    # not be sortable.  In that case we can just return,
+                    # because we're not dealing with a proper venusian
+                    # callback.
+                    category_keys.sort()
+                except TypeError:
+                    return
             for category in category_keys:
                 callbacks = attached_categories.get(category, [])
-                for callback, cb_mod_name, liftid, scope in callbacks:
-                    if cb_mod_name != mod_name:
-                        # avoid processing objects that were imported into this
-                        # module but were not actually defined there
-                        continue
-                    callback(self, name, ob)
+                try:
+                    # Metaclasses might trick us by reaching this far and then
+                    # fail with too little values to unpack.
+                    for callback, cb_mod_name, liftid, scope in callbacks:
+                        if cb_mod_name != mod_name:
+                            # avoid processing objects that were imported into
+                            # this module but were not actually defined there
+                            continue
+                        callback(self, name, ob)
+                except ValueError:
+                    continue
 
         for name, ob in getmembers(package):
             # whether it's a module or a package, we need to scan its

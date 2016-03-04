@@ -1,6 +1,9 @@
 1.1 (unreleased)
 ----------------
 
+- Make scanning more resilient of metaclasses that return proxies for any
+  attribute access.
+
 - Fix bug where using the same venusian decorator on both a class and its
   methods would cause the method decorations to be ignored. See
   https://github.com/Pylons/venusian/issues/40
