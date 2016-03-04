@@ -175,7 +175,7 @@ class Scanner(object):
                     # because we're not dealing with a proper venusian
                     # callback.
                     category_keys.sort()
-                except TypeError:
+                except TypeError:  # pragma: no cover
                     return
             for category in category_keys:
                 callbacks = attached_categories.get(category, [])
