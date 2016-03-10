@@ -451,7 +451,7 @@ class lift(object):
     *plus* ones attached to Sub.boo, Sub.hiss, Sub.hump and Sub.smack.
 
     If a subclass overrides a decorator on a method, its superclass decorators
-    will be ignored for the subclass.  That means that in this configuration:
+    will be ignored for the subclass.  That means that in this configuration::
 
       from venusian import lift
       from somepackage import venusian_decorator
