@@ -8,8 +8,7 @@
   methods would cause the method decorations to be ignored. See
   https://github.com/Pylons/venusian/issues/40
 
-- Deprecate support for Python 2.6:  it will be removed in the 1.2
-  release.
+- Drop support for Python 2.6.
 
 - Drop support for Python 3.2:  it is no longer supported by current
   packaging / CI tools.
