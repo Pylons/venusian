@@ -101,17 +101,7 @@ class TestScanner(unittest.TestCase):
             import packageinzip
         test = Test()
         scanner = self._makeOne(test=test)
-        # The following currently causes:
-        #     TypeError: zipimporter.get_filename() takes exactly 1 argument (0 given)
-        # https://github.com/Pylons/venusian/pull/45 fixes this
-        # On Python < 2.7, it causes an AttributeError, because there is no zipimport.get_filename
-        try:
-            scanner.scan(packageinzip)
-        except AttributeError:  # pragma: no cover
-            if sys.version_info < (2, 7):
-                pass
-            else:
-                raise
+        scanner.scan(packageinzip)
 
     def test_package_with_orphaned_pyc_file(self):
         # There is a module2.pyc file in the "pycfixtures" package; it
