@@ -1,5 +1,8 @@
-1.1 (unreleased)
-----------------
+1.1.0 (2017-04-24)
+------------------
+
+- Updated to using py.test instead of nosetest, and added support for Python
+  3.4 -> 3.6
 
 - Make scanning more resilient of metaclasses that return proxies for any
   attribute access.
