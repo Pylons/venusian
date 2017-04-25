@@ -20,7 +20,7 @@ def zip_file_in_sys_path():
     return with_entry_in_sys_path(zip_pkg_path)
 
 
-class Test(object):
+class _Test(object):
     def __init__(self):
         self.registrations = []
     def __call__(self, **kw):
@@ -33,7 +33,7 @@ class TestScanner(unittest.TestCase):
 
     def test_package(self):
         from venusian.tests.fixtures import one
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(one)
         self.assertEqual(len(test.registrations), 6)
@@ -72,7 +72,7 @@ class TestScanner(unittest.TestCase):
     def test_module_in_zip(self):
         with zip_file_in_sys_path():
             import moduleinzip
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(moduleinzip)
         self.assertEqual(len(test.registrations), 3)
@@ -99,7 +99,7 @@ class TestScanner(unittest.TestCase):
     def test_package_in_zip(self):
         with zip_file_in_sys_path():
             import packageinzip
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(packageinzip)
 
@@ -108,7 +108,7 @@ class TestScanner(unittest.TestCase):
         # has no corresponding .py source file.  Such orphaned .pyc
         # files should be ignored during scanning.
         from venusian.tests.fixtures import pyc
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test) 
         scanner.scan(pyc)
         self.assertEqual(len(test.registrations), 4)
@@ -136,7 +136,7 @@ class TestScanner(unittest.TestCase):
 
     def test_module(self):
         from venusian.tests.fixtures.one import module
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(module)
         self.assertEqual(len(test.registrations), 3)
@@ -163,7 +163,7 @@ class TestScanner(unittest.TestCase):
         # there
         from venusian.tests.fixtures.importonly import one
         from venusian.tests.fixtures.importonly import two
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(one)
         self.assertEqual(len(test.registrations), 1)
@@ -174,14 +174,14 @@ class TestScanner(unittest.TestCase):
         # make sure venusian picks up other decorated things from
         # imported modules when the whole package is scanned
         from venusian.tests.fixtures import import_and_scan
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(import_and_scan)
         self.assertEqual(len(test.registrations), 2)
 
     def test_one_category(self):
         from venusian.tests.fixtures import category
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(category, categories=('mycategory',))
         self.assertEqual(len(test.registrations), 1)
@@ -191,7 +191,7 @@ class TestScanner(unittest.TestCase):
 
     def test_all_categories_implicit(self):
         from venusian.tests.fixtures import category
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(category)
         self.assertEqual(len(test.registrations), 2)
@@ -204,7 +204,7 @@ class TestScanner(unittest.TestCase):
 
     def test_all_categories_explicit(self):
         from venusian.tests.fixtures import category
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(category, categories=('mycategory', 'mycategory2'))
         self.assertEqual(len(test.registrations), 2)
@@ -217,7 +217,7 @@ class TestScanner(unittest.TestCase):
 
     def test_decorations_arent_inherited(self):
         from venusian.tests.fixtures import inheritance
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(inheritance)
         self.assertEqual(test.registrations, [
@@ -227,7 +227,7 @@ class TestScanner(unittest.TestCase):
 
     def test_classdecorator(self):
         from venusian.tests.fixtures import classdecorator
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(classdecorator)
         test.registrations.sort(key=lambda x: (x['name'], x['ob'].__module__))
@@ -243,7 +243,7 @@ class TestScanner(unittest.TestCase):
 
     def test_class_and_method_decorator(self):
         from venusian.tests.fixtures import class_and_method
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(class_and_method)
         self.assertEqual(len(test.registrations), 2)
@@ -259,7 +259,7 @@ class TestScanner(unittest.TestCase):
     def test_scan_only_finds_classdecoration_once(self):
         from venusian.tests.fixtures import two
         from venusian.tests.fixtures.two.mod1 import Class
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(two)
         self.assertEqual(test.registrations, [
@@ -269,7 +269,7 @@ class TestScanner(unittest.TestCase):
             
     def test_importerror_during_scan_default_onerror(self):
         from venusian.tests.fixtures import importerror
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         # without a custom onerror, scan will propagate the importerror from
         # will_cause_import_error
@@ -277,7 +277,7 @@ class TestScanner(unittest.TestCase):
 
     def test_importerror_during_scan_default_onerror_with_ignore(self):
         from venusian.tests.fixtures import importerror
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         # scan will ignore the errors from will_cause_import_error due
         # to us choosing to ignore that package
@@ -287,7 +287,7 @@ class TestScanner(unittest.TestCase):
 
     def test_importerror_during_scan_custom_onerror(self):
         from venusian.tests.fixtures import importerror
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         # with this custom onerror, scan will not propagate the importerror
         # from will_raise_importerror
@@ -303,7 +303,7 @@ class TestScanner(unittest.TestCase):
     def test_importerror_in_package_during_scan_custom_onerror(self):
         from venusian.tests.fixtures import importerror_package
         md('venusian.tests.fixtures.importerror_package.will_cause_import_error')
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         # with this custom onerror, scan will not propagate the importerror
         # from will_raise_importerror
@@ -319,7 +319,7 @@ class TestScanner(unittest.TestCase):
 
     def test_attrerror_during_scan_custom_onerror(self):
         from venusian.tests.fixtures import attrerror
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         # with this custom onerror, scan will not propagate the importerror
         # from will_raise_importerror
@@ -336,7 +336,7 @@ class TestScanner(unittest.TestCase):
     def test_attrerror_in_package_during_scan_custom_onerror(self):
         from venusian.tests.fixtures import attrerror_package
         md('venusian.tests.fixtures.attrerror_package.will_cause_import_error')
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         # with this custom onerror, scan will not propagate the importerror
         # from will_raise_importerror
@@ -353,7 +353,7 @@ class TestScanner(unittest.TestCase):
     def test_attrerror_in_package_during_scan_no_custom_onerror(self):
         from venusian.tests.fixtures import attrerror_package
         md('venusian.tests.fixtures.attrerror_package.will_cause_import_error')
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         self.assertRaises(AttributeError, scanner.scan, attrerror_package)
         self.assertEqual(len(test.registrations), 1)
@@ -364,7 +364,7 @@ class TestScanner(unittest.TestCase):
         
     def test_onerror_used_to_swallow_all_exceptions(self):
         from venusian.tests.fixtures import subpackages
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         # onerror can also be used to skip errors while scanning submodules
         # e.g.: test modules under a given library
@@ -383,7 +383,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_by_full_dotted_name(self):
         from venusian.tests.fixtures import one
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(
             one, 
@@ -408,7 +408,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_by_full_dotted_name2(self):
         from venusian.tests.fixtures import nested
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(
             nested, 
@@ -433,7 +433,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_by_full_dotted_name3(self):
         from venusian.tests.fixtures import nested
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(
             nested, 
@@ -448,7 +448,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_by_full_dotted_name4(self):
         from venusian.tests.fixtures import nested
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(
             nested, 
@@ -469,7 +469,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_by_relative_dotted_name(self):
         from venusian.tests.fixtures import one
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(one,  ignore=['.module2'])
         self.assertEqual(len(test.registrations), 3)
@@ -491,7 +491,7 @@ class TestScanner(unittest.TestCase):
         
     def test_ignore_by_relative_dotted_name2(self):
         from venusian.tests.fixtures import nested
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(
             nested, 
@@ -516,7 +516,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_by_relative_dotted_name3(self):
         from venusian.tests.fixtures import nested
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(
             nested, 
@@ -530,7 +530,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_by_relative_dotted_name4(self):
         from venusian.tests.fixtures import nested
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(
             nested, 
@@ -550,7 +550,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_by_function(self):
         from venusian.tests.fixtures import one
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(one, ignore=[re.compile('Class').search, 
                                   re.compile('inst').search])
@@ -568,7 +568,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_by_function_nested(self):
         from venusian.tests.fixtures import nested
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(
             nested, 
@@ -578,7 +578,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_by_function_nested2(self):
         from venusian.tests.fixtures import nested
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(
             nested, 
@@ -601,7 +601,7 @@ class TestScanner(unittest.TestCase):
         
     def test_ignore_as_string(self):
         from venusian.tests.fixtures import one
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(one, ignore='venusian.tests.fixtures.one.module2')
         self.assertEqual(len(test.registrations), 3)
@@ -624,7 +624,7 @@ class TestScanner(unittest.TestCase):
     def test_ignore_mixed_string_and_func(self):
         import re
         from venusian.tests.fixtures import one
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(one, ignore=['venusian.tests.fixtures.one.module2',
                                   re.compile('inst').search])
@@ -643,7 +643,7 @@ class TestScanner(unittest.TestCase):
     def test_ignore_mixed_string_abs_rel_and_func(self):
         import re
         from venusian.tests.fixtures import one
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(one, ignore=['venusian.tests.fixtures.one.module2',
                                   '.module',
@@ -652,7 +652,7 @@ class TestScanner(unittest.TestCase):
 
     def test_lifting1(self):
         from venusian.tests.fixtures import lifting1
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(lifting1)
         test.registrations.sort(
@@ -706,7 +706,7 @@ class TestScanner(unittest.TestCase):
 
     def test_lifting2(self):
         from venusian.tests.fixtures import lifting2
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(lifting2)
         test.registrations.sort(
@@ -740,7 +740,7 @@ class TestScanner(unittest.TestCase):
 
     def test_lifting3(self):
         from venusian.tests.fixtures import lifting3
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(lifting3)
         test.registrations.sort(
@@ -782,7 +782,7 @@ class TestScanner(unittest.TestCase):
 
     def test_lifting4(self):
         from venusian.tests.fixtures import lifting4
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(lifting4)
         test.registrations.sort(
@@ -800,7 +800,7 @@ class TestScanner(unittest.TestCase):
 
     def test_lifting5(self):
         from venusian.tests.fixtures import lifting5
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(lifting5)
         test.registrations.sort(
@@ -870,7 +870,7 @@ class TestScanner(unittest.TestCase):
 
     def test_subclassing(self):
         from venusian.tests.fixtures import subclassing
-        test = Test()
+        test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(subclassing)
         test.registrations.sort(
