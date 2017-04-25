@@ -42,7 +42,7 @@ docs_extras = [
 setup(name='venusian',
       version='1.1-dev0',
       description='A library for deferring decorator actions',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
           "Development Status :: 6 - Mature",
           "Intended Audience :: Developers",
@@ -68,9 +68,9 @@ setup(name='venusian',
           'testing': testing_extras,
           'docs': docs_extras,
       },
-      tests_require = [],
-      install_requires = [],
+      tests_require=[],
+      install_requires=[],
       test_suite='venusian',
-      entry_points = """\
+      entry_points="""\
       """
       )
