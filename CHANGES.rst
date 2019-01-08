@@ -1,6 +1,8 @@
 1.2.0 (unreleased)
 ------------------
 
+- Add support for Python 3.7.
+
 - Drop support for Python 3.3.
 
 1.1.0 (2017-04-24)
