@@ -40,7 +40,7 @@ docs_extras = [
 ]
 
 setup(name='venusian',
-      version='1.1.0',
+      version='1.2.0.dev0',
       description='A library for deferring decorator actions',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
@@ -49,7 +49,6 @@ setup(name='venusian',
           "Programming Language :: Python",
           "Programming Language :: Python :: 2.7",
           "Programming Language :: Python :: 3",
-          "Programming Language :: Python :: 3.3",
           "Programming Language :: Python :: 3.4",
           "Programming Language :: Python :: 3.5",
           "Programming Language :: Python :: 3.6",
