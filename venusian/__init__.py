@@ -1,4 +1,3 @@
-import imp
 from inspect import getmembers, getmro, isclass
 from pkgutil import iter_modules
 import sys
@@ -12,6 +11,9 @@ from venusian.advice import getFrameInfo
 
 ATTACH_ATTR = '__venusian_callbacks__'
 LIFTONLY_ATTR = '__venusian_liftonly_callbacks__'
+IMP_PY_SOURCE = 1
+IMP_PY_COMPILED = 2
+IMP_PKG_DIRECTORY = 5
 
 class Scanner(object):
     def __init__(self, **kw):
@@ -210,7 +212,7 @@ class Scanner(object):
                             module_type = loader.etc[2]
                         else: # pragma: no cover
                             # py3.3b2+ (importlib-using)
-                            module_type = imp.PY_SOURCE
+                            module_type = IMP_PY_SOURCE
                             get_filename = getattr(loader, 'get_filename', None)
                             if get_filename is None:
                                 get_filename = loader._get_filename
@@ -219,10 +221,10 @@ class Scanner(object):
                             except TypeError:
                                 fn = get_filename()
                             if fn.endswith(('.pyc', '.pyo', '$py.class')):
-                                module_type = imp.PY_COMPILED
+                                module_type = IMP_PY_COMPILED
                         # only scrape members from non-orphaned source files
                         # and package directories
-                        if module_type in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
+                        if module_type in (IMP_PY_SOURCE, IMP_PKG_DIRECTORY):
                             # NB: use __import__(modname) rather than
                             # loader.load_module(modname) to prevent
                             # inappropriate double-execution of module code
