@@ -1,0 +1,18 @@
+graft src/venusian
+graft tests
+graft docs
+prune docs/_build
+prune docs/_themes
+
+include README.rst
+include CHANGES.rst
+include LICENSE.txt
+include CONTRIBUTING.rst
+include CONTRIBUTORS.txt
+include COPYRIGHT.txt
+
+include pyproject.toml setup.cfg
+include .coveragerc
+include tox.ini .travis.yml rtd.txt
+
+recursive-exclude * __pycache__ *.py[cod]
