@@ -1,12 +1,6 @@
-import imp
 from inspect import getmembers, getmro, isclass
 from pkgutil import iter_modules
 import sys
-
-from venusian.compat import (
-    is_nonstr_iter,
-    INT_TYPES,
-    )
 
 from venusian.advice import getFrameInfo
 
@@ -108,7 +102,10 @@ class Scanner(object):
 
         pkg_name = package.__name__
 
-        if ignore is not None and not is_nonstr_iter(ignore):
+        if ignore is not None and (
+            isinstance(ignore, str) or
+            not hasattr(ignore, '__iter__')
+        ):
             ignore = [ignore]
         elif ignore is None:
             ignore = []
@@ -188,7 +185,7 @@ class Scanner(object):
                             # this module but were not actually defined there
                             continue
                         callback(self, name, ob)
-                except ValueError:
+                except ValueError:  # pragma: nocover
                     continue
 
         for name, ob in getmembers(package):
@@ -205,41 +202,31 @@ class Scanner(object):
                 loader = importer.find_module(modname)
                 if loader is not None: # happens on pypy with orphaned pyc
                     try:
-                        if hasattr(loader, 'etc'):
-                            # python < py3.3
-                            module_type = loader.etc[2]
-                        else: # pragma: no cover
-                            # py3.3b2+ (importlib-using)
-                            module_type = imp.PY_SOURCE
-                            get_filename = getattr(loader, 'get_filename', None)
-                            if get_filename is None:
-                                get_filename = loader._get_filename
-                            try:
-                                fn = get_filename(modname)
-                            except TypeError:
-                                fn = get_filename()
-                            if fn.endswith(('.pyc', '.pyo', '$py.class')):
-                                module_type = imp.PY_COMPILED
-                        # only scrape members from non-orphaned source files
-                        # and package directories
-                        if module_type in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
-                            # NB: use __import__(modname) rather than
-                            # loader.load_module(modname) to prevent
-                            # inappropriate double-execution of module code
-                            try:
-                                __import__(modname)
-                            except Exception:
-                                if onerror is not None:
-                                    onerror(modname)
-                                else:
-                                    raise
-                            module = sys.modules.get(modname)
-                            if module is not None:
-                                for name, ob in getmembers(module, None):
-                                    invoke(modname, name, ob)
+                        get_filename = getattr(loader, 'get_filename', None)
+                        if get_filename is None:  # pragma: nocover
+                            get_filename = loader._get_filename
+                        try:
+                            fn = get_filename(modname)
+                        except TypeError:  # pragma: nocover
+                            fn = get_filename()
+
+                        # NB: use __import__(modname) rather than
+                        # loader.load_module(modname) to prevent
+                        # inappropriate double-execution of module code
+                        try:
+                            __import__(modname)
+                        except Exception:
+                            if onerror is not None:
+                                onerror(modname)
+                            else:
+                                raise
+                        module = sys.modules.get(modname)
+                        if module is not None:
+                            for name, ob in getmembers(module, None):
+                                invoke(modname, name, ob)
                     finally:
-                        if  ( hasattr(loader, 'file') and
-                              hasattr(loader.file,'close') ):
+                        if ( hasattr(loader, 'file') and
+                                hasattr(loader.file,'close') ):  # pragma: nocover
                             loader.file.close()
 
 class AttachInfo(object):
@@ -292,7 +279,7 @@ class Categories(dict):
         self.lifted = False
 
     def attached_to(self, mod_name, name, obj):
-        if isinstance(self.attached_id, INT_TYPES):
+        if isinstance(self.attached_id, int):
             return self.attached_id == id(obj)
         return self.attached_id == (mod_name, name)
 
