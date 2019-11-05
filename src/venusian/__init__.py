@@ -4,8 +4,9 @@ import sys
 
 from venusian.advice import getFrameInfo
 
-ATTACH_ATTR = '__venusian_callbacks__'
-LIFTONLY_ATTR = '__venusian_liftonly_callbacks__'
+ATTACH_ATTR = "__venusian_callbacks__"
+LIFTONLY_ATTR = "__venusian_liftonly_callbacks__"
+
 
 class Scanner(object):
     def __init__(self, **kw):
@@ -103,8 +104,7 @@ class Scanner(object):
         pkg_name = package.__name__
 
         if ignore is not None and (
-            isinstance(ignore, str) or
-            not hasattr(ignore, '__iter__')
+            isinstance(ignore, str) or not hasattr(ignore, "__iter__")
         ):
             ignore = [ignore]
         elif ignore is None:
@@ -113,12 +113,12 @@ class Scanner(object):
         # non-leading-dotted name absolute object name
         str_ignores = [ign for ign in ignore if isinstance(ign, str)]
         # leading dotted name relative to scanned package
-        rel_ignores = [ign for ign in str_ignores if ign.startswith('.')]
+        rel_ignores = [ign for ign in str_ignores if ign.startswith(".")]
         # non-leading dotted names
-        abs_ignores = [ign for ign in str_ignores if not ign.startswith('.')]
+        abs_ignores = [ign for ign in str_ignores if not ign.startswith(".")]
         # functions, e.g. re.compile('pattern').search
         callable_ignores = [ign for ign in ignore if callable(ign)]
-        
+
         def _ignore(fullname):
             for ign in rel_ignores:
                 if fullname.startswith(pkg_name + ign):
@@ -132,10 +132,9 @@ class Scanner(object):
                     return True
             return False
 
-
         def invoke(mod_name, name, ob):
 
-            fullname = mod_name + '.' + name
+            fullname = mod_name + "." + name
 
             if _ignore(fullname):
                 return
@@ -194,15 +193,19 @@ class Scanner(object):
             # subpackages
             invoke(pkg_name, name, ob)
 
-        if hasattr(package, '__path__'): # package, not module
-            results = walk_packages(package.__path__, package.__name__+'.',
-                                    onerror=onerror, ignore=_ignore)
+        if hasattr(package, "__path__"):  # package, not module
+            results = walk_packages(
+                package.__path__,
+                package.__name__ + ".",
+                onerror=onerror,
+                ignore=_ignore,
+            )
 
             for importer, modname, ispkg in results:
                 loader = importer.find_module(modname)
-                if loader is not None: # happens on pypy with orphaned pyc
+                if loader is not None:  # happens on pypy with orphaned pyc
                     try:
-                        get_filename = getattr(loader, 'get_filename', None)
+                        get_filename = getattr(loader, "get_filename", None)
                         if get_filename is None:  # pragma: nocover
                             get_filename = loader._get_filename
                         try:
@@ -225,9 +228,11 @@ class Scanner(object):
                             for name, ob in getmembers(module, None):
                                 invoke(modname, name, ob)
                     finally:
-                        if ( hasattr(loader, 'file') and
-                                hasattr(loader.file,'close') ):  # pragma: nocover
+                        if hasattr(loader, "file") and hasattr(
+                            loader.file, "close"
+                        ):  # pragma: nocover
                             loader.file.close()
+
 
 class AttachInfo(object):
     """
@@ -266,8 +271,10 @@ class AttachInfo(object):
       'testCallInfo', 'add_handler(foo, bar)')``
       
     """
+
     def __init__(self, **kw):
         self.__dict__.update(kw)
+
 
 class Categories(dict):
     def __init__(self, attached_to):
@@ -283,6 +290,7 @@ class Categories(dict):
             return self.attached_id == id(obj)
         return self.attached_id == (mod_name, name)
 
+
 def attach(wrapped, callback, category=None, depth=1, name=None):
     """ Attach a callback to the wrapped object.  It will be found
     later during a scan.  This function returns an instance of the
@@ -296,20 +304,20 @@ def attach(wrapped, callback, category=None, depth=1, name=None):
     determine if decorations of a method should be inherited or overridden.
     """
 
-    frame = sys._getframe(depth+1)
+    frame = sys._getframe(depth + 1)
     scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
-    module_name = getattr(module, '__name__', None)
-    wrapped_name = getattr(wrapped, '__name__', None)
+    module_name = getattr(module, "__name__", None)
+    wrapped_name = getattr(wrapped, "__name__", None)
     class_name = codeinfo[2]
 
-    liftid = '%s %s' % (wrapped_name, name)
-    
-    if scope == 'class':
+    liftid = "%s %s" % (wrapped_name, name)
+
+    if scope == "class":
         # we're in the midst of a class statement
         categories = f_locals.get(ATTACH_ATTR, None)
         if categories is None or not categories.attached_to(
             module_name, class_name, None
-            ):
+        ):
             categories = Categories((module_name, class_name))
             f_locals[ATTACH_ATTR] = categories
         callbacks = categories.setdefault(category, [])
@@ -317,7 +325,7 @@ def attach(wrapped, callback, category=None, depth=1, name=None):
         categories = getattr(wrapped, ATTACH_ATTR, None)
         if categories is None or not categories.attached_to(
             module_name, wrapped_name, wrapped
-            ):
+        ):
             # if there aren't any attached categories, or we've retrieved
             # some by inheritance, we need to create new ones
             categories = Categories(wrapped)
@@ -333,9 +341,10 @@ def attach(wrapped, callback, category=None, depth=1, name=None):
         globals=f_globals,
         category=category,
         codeinfo=codeinfo,
-        )
+    )
 
-def walk_packages(path=None, prefix='', onerror=None, ignore=None):
+
+def walk_packages(path=None, prefix="", onerror=None, ignore=None):
     """Yields (module_loader, name, ispkg) for all modules recursively
     on path, or, if path is None, all accessible modules.
 
@@ -371,7 +380,7 @@ def walk_packages(path=None, prefix='', onerror=None, ignore=None):
     """
 
     def seen(p, m={}):
-        if p in m: # pragma: no cover
+        if p in m:  # pragma: no cover
             return True
         m[p] = True
 
@@ -395,12 +404,12 @@ def walk_packages(path=None, prefix='', onerror=None, ignore=None):
                     raise
             else:
                 yield importer, name, ispkg
-                path = getattr(sys.modules[name], '__path__', None) or []
+                path = getattr(sys.modules[name], "__path__", None) or []
 
                 # don't traverse path items we've seen before
                 path = [p for p in path if not seen(p)]
 
-                for item in walk_packages(path, name+'.', onerror, ignore):
+                for item in walk_packages(path, name + ".", onerror, ignore):
                     yield item
         else:
             yield importer, name, ispkg
@@ -468,6 +477,7 @@ class lift(object):
     in this category will be lifted if it is suppled.
           
     """
+
     def __init__(self, categories=None):
         self.categories = categories
 
@@ -475,11 +485,11 @@ class lift(object):
         if not isclass(wrapped):
             raise RuntimeError(
                 '"lift" only works as a class decorator; you tried to use '
-                'it against %r' % wrapped
-                )
+                "it against %r" % wrapped
+            )
         frame = sys._getframe(1)
         scope, module, f_locals, f_globals, codeinfo = getFrameInfo(frame)
-        module_name = getattr(module, '__name__', None)
+        module_name = getattr(module, "__name__", None)
         newcategories = Categories(wrapped)
         newcategories.lifted = True
         for cls in getmro(wrapped):
@@ -496,9 +506,9 @@ class lift(object):
                     for cb, _, liftid, cscope in category:
                         append = True
                         toappend = (cb, module_name, liftid, cscope)
-                        if cscope == 'class':
+                        if cscope == "class":
                             for ncb, _, nliftid, nscope in callbacks:
-                                if (nscope == 'class' and liftid == nliftid):
+                                if nscope == "class" and liftid == nliftid:
                                     append = False
                         if append:
                             newcallbacks.append(toappend)
@@ -506,10 +516,11 @@ class lift(object):
                     newcategories[cname] = newcategory
                 if attached_categories.lifted:
                     break
-        if newcategories: # if it has any keys
+        if newcategories:  # if it has any keys
             setattr(wrapped, ATTACH_ATTR, newcategories)
         return wrapped
-        
+
+
 class onlyliftedfrom(object):
     """
     A class decorator which marks a class as 'only lifted from'.  Decorations
@@ -541,12 +552,13 @@ class onlyliftedfrom(object):
     Sub.hiss.  The inherited decorators on Super.boo and Super.hiss will be
     not be registered.
     """
+
     def __call__(self, wrapped):
         if not isclass(wrapped):
             raise RuntimeError(
                 '"onlyliftedfrom" only works as a class decorator; you tried '
-                'to use it against %r' % wrapped
-                )
+                "to use it against %r" % wrapped
+            )
         cats = getattr(wrapped, ATTACH_ATTR, None)
         class_name = wrapped.__name__
         module_name = wrapped.__module__
@@ -558,4 +570,3 @@ class onlyliftedfrom(object):
         delattr(wrapped, ATTACH_ATTR)
         setattr(wrapped, LIFTONLY_ATTR, cats)
         return wrapped
-        

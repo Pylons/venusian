@@ -1,5 +1,6 @@
 import venusian
 
+
 class decorator(object):
     category = None
     call_count = 0
@@ -9,20 +10,23 @@ class decorator(object):
 
     def __call__(self, wrapped):
         view_config = self.__dict__.copy()
+
         def callback(context, name, ob):
-            if hasattr(context, 'test'):
+            if hasattr(context, "test"):
                 context.test(ob=ob, name=name, **view_config)
             self.__class__.call_count += 1
+
         info = venusian.attach(wrapped, callback, category=self.category)
-        if info.scope == 'class':
+        if info.scope == "class":
             # we're in the midst of a class statement
-            if view_config.get('attr') is None:
-                view_config['attr'] = wrapped.__name__
+            if view_config.get("attr") is None:
+                view_config["attr"] = wrapped.__name__
         return wrapped
 
+
 class categorydecorator(decorator):
-    category = 'mycategory'
-    
+    category = "mycategory"
+
+
 class categorydecorator2(decorator):
-    category = 'mycategory2'
-    
+    category = "mycategory2"

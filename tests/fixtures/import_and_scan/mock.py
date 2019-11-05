@@ -1,6 +1,6 @@
 class _Call(tuple):  # pragma: no cover
     def __new__(cls, value=(), name=None):
-        name = ''
+        name = ""
         args = ()
         kwargs = {}
         _len = len(value)
@@ -13,15 +13,15 @@ class _Call(tuple):  # pragma: no cover
 
     def __call__(self, *args, **kwargs):
         if self.name is None:
-            return _Call(('', args, kwargs), name='()')
+            return _Call(("", args, kwargs), name="()")
         else:
-            return _Call((self.name, args, kwargs), name=self.name + '()')
+            return _Call((self.name, args, kwargs), name=self.name + "()")
 
     def __getattr__(self, attr):
         if self.name is None:
             return _Call(name=attr)
         else:
-            return _Call(name='%s.%s' % (self.name, attr))
+            return _Call(name="%s.%s" % (self.name, attr))
 
 
 call = _Call()

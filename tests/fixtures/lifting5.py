@@ -1,38 +1,50 @@
 from venusian import lift
 from tests.fixtures import decorator
 
-class Super1(object): # pragma: no cover
+
+class Super1(object):  # pragma: no cover
     @decorator()
-    def classname(self): pass
+    def classname(self):
+        pass
 
     @decorator()
-    def boo(self): pass
+    def boo(self):
+        pass
 
     @decorator()
-    def ram(self): pass
+    def ram(self):
+        pass
 
     @decorator()
-    def jump(self): pass
+    def jump(self):
+        pass
+
 
 @lift()
-class Super2(Super1): # pragma: no cover
+class Super2(Super1):  # pragma: no cover
     @decorator()
-    def boo(self): pass
+    def boo(self):
+        pass
 
     @decorator()
-    def hiss(self): pass
+    def hiss(self):
+        pass
 
     @decorator()
-    def jump(self): pass
-        
+    def jump(self):
+        pass
+
+
 @lift()
-class Sub(Super2): # pragma: no cover
+class Sub(Super2):  # pragma: no cover
     @decorator()
-    def boo(self): pass
+    def boo(self):
+        pass
 
     @decorator()
-    def hiss(self): pass
-    
+    def hiss(self):
+        pass
+
     @decorator()
-    def smack(self): pass
-    
+    def smack(self):
+        pass
