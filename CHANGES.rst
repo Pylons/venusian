@@ -1,3 +1,11 @@
+3.0.0 (2019-10-04)
+------------------
+
+- This release matches 2.0.0 other than in the version number. This fixes an
+  issue with Requires-Python metadata not being uploaded correctly to PyPi.
+
+  This version is only compatible with Python 3.5+
+
 2.0.0 (2019-10-04)
 ------------------
 
