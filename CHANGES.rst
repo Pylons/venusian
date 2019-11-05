@@ -1,3 +1,9 @@
+2.1.0 (2019-10-05)
+------------------
+
+- No changes from 1.2.0 for this version, this is the last release that
+  supports both Python 2 and 3.
+
 1.2.0 (2019-01-08)
 ------------------
 
