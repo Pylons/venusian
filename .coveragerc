@@ -1,0 +1,14 @@
+[run]
+parallel = true
+source =
+    venusian
+
+[paths]
+source =
+    src/venusian
+    */src/venusian
+    */site-packages/venusian
+
+[report]
+show_missing = true
+precision = 2
