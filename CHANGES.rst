@@ -1,3 +1,12 @@
+2.0.0 (2019-10-04)
+------------------
+
+- Drop support for Python 2.7, 3.3, and 3.4
+
+- Removed the usage of the ``imp`` module to squelch the warnings regarding a
+  deprecated modules. See https://github.com/Pylons/venusian/pull/63 and
+  https://github.com/Pylons/venusian/issues/57
+
 1.2.0 (2019-01-08)
 ------------------
 
