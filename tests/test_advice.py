@@ -34,13 +34,17 @@ from venusian import advice
 PY3 = sys.version_info[0] >= 3
 
 if not PY3:
+
     class ClassicClass:
         classLevelFrameInfo = advice.getFrameInfo(sys._getframe())
+
 
 class NewStyleClass(object):
     classLevelFrameInfo = advice.getFrameInfo(sys._getframe())
 
+
 moduleLevelFrameInfo = advice.getFrameInfo(sys._getframe())
+
 
 class FrameInfoTest(unittest.TestCase):
 
@@ -54,9 +58,15 @@ class FrameInfoTest(unittest.TestCase):
         self.assertEqual(len(codeinfo), 4)
 
     if not PY3:
+
         def testClassicClassInfo(self):
-            (kind, module, f_locals, f_globals,
-             codeinfo) = ClassicClass.classLevelFrameInfo
+            (
+                kind,
+                module,
+                f_locals,
+                f_globals,
+                codeinfo,
+            ) = ClassicClass.classLevelFrameInfo
             self.assertEqual(kind, "class")
 
             self.assertTrue(f_locals is ClassicClass.__dict__)  # ???
@@ -65,8 +75,13 @@ class FrameInfoTest(unittest.TestCase):
             self.assertEqual(len(codeinfo), 4)
 
     def testNewStyleClassInfo(self):
-        (kind, module, f_locals,
-         f_globals, codeinfo) = NewStyleClass.classLevelFrameInfo
+        (
+            kind,
+            module,
+            f_locals,
+            f_globals,
+            codeinfo,
+        ) = NewStyleClass.classLevelFrameInfo
         self.assertEqual(kind, "class")
 
         for d in module.__dict__, f_globals:
@@ -74,10 +89,11 @@ class FrameInfoTest(unittest.TestCase):
         self.assertEqual(len(codeinfo), 4)
 
     def testCallInfo(self):
-        (kind, module, f_locals, f_globals,
-         codeinfo) = advice.getFrameInfo(sys._getframe())
+        (kind, module, f_locals, f_globals, codeinfo) = advice.getFrameInfo(
+            sys._getframe()
+        )
         self.assertEqual(kind, "function call")
-        self.assertTrue(f_locals is locals()) # ???
+        self.assertTrue(f_locals is locals())  # ???
         for d in module.__dict__, f_globals:
             self.assertTrue(d is globals())
         self.assertEqual(len(codeinfo), 4)
