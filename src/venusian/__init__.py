@@ -13,7 +13,7 @@ class Scanner(object):
         self.__dict__.update(kw)
 
     def scan(self, package, categories=None, onerror=None, ignore=None):
-        """ Scan a Python package and any of its subpackages.  All
+        """Scan a Python package and any of its subpackages.  All
         top-level objects will be considered; those marked with
         venusian callback attributes related to ``category`` will be
         processed.
@@ -34,7 +34,7 @@ class Scanner(object):
         happen during its code importing process, including
         :exc:`ImportError`.  If you use a custom ``onerror`` callback, you
         can change this behavior.
-        
+
         Here's an example ``onerror`` callback that ignores
         :exc:`ImportError`::
 
@@ -96,7 +96,7 @@ class Scanner(object):
 
         A string or callable alone can also be passed as ``ignore`` without a
         surrounding list.
-        
+
         .. versionadded:: 1.0a3
            the ``ignore`` argument
         """
@@ -269,7 +269,7 @@ class AttachInfo(object):
       representing the context of the venusian decorator used.  Eg.
       ``('/home/chrism/projects/venusian/tests/test_advice.py', 81,
       'testCallInfo', 'add_handler(foo, bar)')``
-      
+
     """
 
     def __init__(self, **kw):
@@ -292,7 +292,7 @@ class Categories(dict):
 
 
 def attach(wrapped, callback, category=None, depth=1, name=None):
-    """ Attach a callback to the wrapped object.  It will be found
+    """Attach a callback to the wrapped object.  It will be found
     later during a scan.  This function returns an instance of the
     :class:`venusian.AttachInfo` class.
 
@@ -432,13 +432,13 @@ class lift(object):
 
           @venusian_decorator()
           def jump(self): pass
-              
+
       @lift()
       class Sub(Super):
           def boo(self): pass
 
           def hiss(self): pass
-          
+
           @venusian_decorator()
           def smack(self): pass
 
@@ -463,7 +463,7 @@ class lift(object):
       class Sub(Super):
 
           def boo(self): pass
-          
+
           @venusian_decorator()
           def hiss(self): pass
 
@@ -475,7 +475,7 @@ class lift(object):
     The ``lift`` decorator takes a single argument named 'categories'.  If
     supplied, it should be a tuple of category names.  Only decorators
     in this category will be lifted if it is suppled.
-          
+
     """
 
     def __init__(self, categories=None):
@@ -529,7 +529,7 @@ class onlyliftedfrom(object):
     ``lift`` class decorator will use the superclass decoration callbacks.
 
     For example::
-    
+
       from venusian import lift, onlyliftedfrom
       from somepackage import venusian_decorator
 
@@ -545,7 +545,7 @@ class onlyliftedfrom(object):
       class Sub(Super):
 
           def boo(self): pass
-          
+
           def hiss(self): pass
 
     Only two decorator callbacks will be run: the ones attached to Sub.boo and

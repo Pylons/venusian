@@ -232,7 +232,10 @@ class TestScanner(unittest.TestCase):
         scanner = self._makeOne(test=test)
         scanner.scan(inheritance)
         self.assertEqual(
-            test.registrations, [dict(name="Parent", ob=inheritance.Parent),]
+            test.registrations,
+            [
+                dict(name="Parent", ob=inheritance.Parent),
+            ],
         )
 
     def test_classdecorator(self):
@@ -271,7 +274,12 @@ class TestScanner(unittest.TestCase):
         test = _Test()
         scanner = self._makeOne(test=test)
         scanner.scan(two)
-        self.assertEqual(test.registrations, [dict(name="Class", ob=Class),])
+        self.assertEqual(
+            test.registrations,
+            [
+                dict(name="Class", ob=Class),
+            ],
+        )
 
     def test_importerror_during_scan_default_onerror(self):
         from tests.fixtures import importerror
