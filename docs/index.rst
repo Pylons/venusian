@@ -109,7 +109,7 @@ To do so, he might refactor his code to look like this:
 
 Then in test code he might import only the ``_logged_in`` function
 instead of the decorated ``logged_in`` function for purposes of unit
-testing.  In such a scenario, the concentious unit testing app
+testing.  In such a scenario, the conscientious unit testing app
 developer has to define two functions for each decorated function.  If
 you're thinking "that looks pretty tedious", you're right.
 
