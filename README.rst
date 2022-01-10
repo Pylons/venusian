@@ -1,8 +1,8 @@
 venusian
 ========
 
-.. image:: https://travis-ci.org/Pylons/venusian.png?branch=master
-        :target: https://travis-ci.org/Pylons/venusian
+.. image:: https://github.com/Pylons/venusian/workflows/Build%20and%20test/badge.svg
+    :target: https://github.com/Pylons/venusian/actions?query=workflow%3A%22Build+and+test%22
 
 .. image:: https://readthedocs.org/projects/venusian/badge/?version=latest
         :target: https://docs.pylonsproject.org/projects/venusian/en/latest/

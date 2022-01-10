@@ -13,6 +13,6 @@ include COPYRIGHT.txt
 
 include pyproject.toml setup.cfg
 include .coveragerc
-include tox.ini .travis.yml rtd.txt
+include tox.ini rtd.txt
 
 recursive-exclude * __pycache__ *.py[cod]
