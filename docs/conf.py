@@ -52,9 +52,9 @@ exclude_patterns = []
 #
 html_theme = "pylons"
 html_theme_path = pylons_sphinx_themes.get_html_themes_path()
-html_theme_options = dict(github_url="https://github.com/Pylons/venusian")
 html_theme_options = dict(
-    canonical_url="https://docs.pylonsproject.org/projects/venusian/en/latest/"
+    github_url="https://github.com/Pylons/venusian",
+    canonical_url="https://docs.pylonsproject.org/projects/venusian/en/latest/",
 )
 
 # Add any paths that contain custom static files (such as style sheets) here,
