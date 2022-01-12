@@ -18,31 +18,30 @@ import pkg_resources
 import pylons_sphinx_themes
 
 
-# -- Project information -----------------------------------------------------
-
-project = "venusian"
-copyright = "2022, Pylons Project"
-author = "Pylons Project"
-
-# The full version, including alpha/beta/rc tags
-release = "3.0.0"
-
-
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named "sphinx.ext.*") or your custom
-# ones.
+# extensions coming with Sphinx (named "sphinx.ext.*") or your custom ones.
 extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx_copybutton",
 ]
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+# General substitutions.
+author = "Pylons Project"
+year = datetime.datetime.now().year
+copyright = "2012-%s Pylons Project <pylons-discuss@googlegroups.com>" % year
 
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+# The default replacements for |version| and |release|, also used in various
+# other places throughout the built documents.
+#
+# The short X.Y version.
+version = pkg_resources.get_distribution("venusian").version
+# The full version, including alpha/beta/rc tags.
+release = version
+
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = "sphinx"
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -71,41 +70,6 @@ html_sidebars = { "**": [
     "searchbox.html",
 ] }
 
-# General configuration
-# ---------------------
-
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named "sphinx.ext.*") or your custom ones.
-extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx_copybutton",
-]
-
-# General substitutions.
-project = "venusian"
-year = datetime.datetime.now().year
-copyright = "2012-%s Pylons Project <pylons-discuss@googlegroups.com>" % year
-
-# The default replacements for |version| and |release|, also used in various
-# other places throughout the built documents.
-#
-# The short X.Y version.
-version = pkg_resources.get_distribution("venusian").version
-# The full version, including alpha/beta/rc tags.
-release = version
-
-# The name of the Pygments (syntax highlighting) style to use.
-pygments_style = "sphinx"
-
-exclude_patterns = [
-    "_themes/README.rst",
-]
-
-# Options for HTML output
-# -----------------------
-
-html_theme_options = {"github_url": "https://github.com/Pylons/venusian"}
-
 # If not "", a "Last updated on:" timestamp is inserted at every page
 # bottom, using the given strftime format.
 html_last_updated_fmt = "%b %d, %Y"
@@ -117,8 +81,7 @@ smartquotes = False
 htmlhelp_basename = "atemplatedoc"
 
 
-# Options for LaTeX output
-# ------------------------
+# -- Options for LaTeX output -------------------------------------------------
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
