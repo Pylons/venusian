@@ -3,13 +3,14 @@
 Venusian
 ========
 
-Venusian is a library which allows you to defer the action of
-decorators.  Instead of taking actions when a function, method, or
-class decorator is executed at import time, you can defer the action
-until a separate "scan" phase.
+Venusian is a library which allows you to defer the action of decorators.
+Instead of taking actions when a function, method, or class decorator is
+executed at import time, you can defer the action until a separate "scan"
+phase.
 
 This library is most useful for framework authors.  It is compatible with
-CPython versions 3.5+. It is also known to work on PyPy 6.0.0 (Python 3.5+).
+CPython versions 3.7+. It is also known to work on PyPy (Compatible with Python
+3.7+).
 
 .. note::
 
