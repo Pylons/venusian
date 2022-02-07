@@ -1,8 +1,8 @@
-import unittest
-import sys
-import re
-import os
 import contextlib
+import os
+import re
+import sys
+import unittest
 
 
 @contextlib.contextmanager
@@ -41,12 +41,12 @@ class TestScanner(unittest.TestCase):
         scanner.scan(one)
         self.assertEqual(len(test.registrations), 6)
         test.registrations.sort(key=lambda x: (x["name"], x["ob"].__module__))
-        from tests.fixtures.one.module import function as func1
-        from tests.fixtures.one.module2 import function as func2
-        from tests.fixtures.one.module import inst as inst1
-        from tests.fixtures.one.module2 import inst as inst2
         from tests.fixtures.one.module import Class as Class1
+        from tests.fixtures.one.module import function as func1
+        from tests.fixtures.one.module import inst as inst1
         from tests.fixtures.one.module2 import Class as Class2
+        from tests.fixtures.one.module2 import function as func2
+        from tests.fixtures.one.module2 import inst as inst2
 
         self.assertEqual(test.registrations[0]["name"], "Class")
         self.assertEqual(test.registrations[0]["ob"], Class1)
@@ -80,12 +80,12 @@ class TestScanner(unittest.TestCase):
         scanner.scan(moduleinzip)
         self.assertEqual(len(test.registrations), 3)
         test.registrations.sort(key=lambda x: (x["name"], x["ob"].__module__))
-        from tests.fixtures.one.module import function as func1
-        from tests.fixtures.one.module2 import function as func2
-        from tests.fixtures.one.module import inst as inst1
-        from tests.fixtures.one.module2 import inst as inst2
         from tests.fixtures.one.module import Class as Class1
+        from tests.fixtures.one.module import function as func1
+        from tests.fixtures.one.module import inst as inst1
         from tests.fixtures.one.module2 import Class as Class2
+        from tests.fixtures.one.module2 import function as func2
+        from tests.fixtures.one.module2 import inst as inst2
 
         self.assertEqual(test.registrations[0]["name"], "Class")
         self.assertEqual(test.registrations[0]["ob"], moduleinzip.Class)
@@ -117,10 +117,10 @@ class TestScanner(unittest.TestCase):
         scanner.scan(pyc)
         self.assertEqual(len(test.registrations), 4)
         test.registrations.sort(key=lambda x: (x["name"], x["ob"].__module__))
+        from tests.fixtures.pyc import subpackage
+        from tests.fixtures.pyc.module import Class as Class1
         from tests.fixtures.pyc.module import function as func1
         from tests.fixtures.pyc.module import inst as inst1
-        from tests.fixtures.pyc.module import Class as Class1
-        from tests.fixtures.pyc import subpackage
 
         self.assertEqual(test.registrations[0]["name"], "Class")
         self.assertEqual(test.registrations[0]["ob"], Class1)
@@ -146,9 +146,9 @@ class TestScanner(unittest.TestCase):
         scanner.scan(module)
         self.assertEqual(len(test.registrations), 3)
         test.registrations.sort(key=lambda x: (x["name"], x["ob"].__module__))
+        from tests.fixtures.one.module import Class as Class1
         from tests.fixtures.one.module import function as func1
         from tests.fixtures.one.module import inst as inst1
-        from tests.fixtures.one.module import Class as Class1
 
         self.assertEqual(test.registrations[0]["name"], "Class")
         self.assertEqual(test.registrations[0]["ob"], Class1)
@@ -166,8 +166,7 @@ class TestScanner(unittest.TestCase):
         # even though "twofunction" is imported into "one", it should not
         # be registered, because it's only imported in one and not defined
         # there
-        from tests.fixtures.importonly import one
-        from tests.fixtures.importonly import two
+        from tests.fixtures.importonly import one, two
 
         test = _Test()
         scanner = self._makeOne(test=test)
@@ -430,9 +429,9 @@ class TestScanner(unittest.TestCase):
         scanner = self._makeOne(test=test)
         scanner.scan(one, ignore=["tests.fixtures.one.module2"])
         self.assertEqual(len(test.registrations), 3)
+        from tests.fixtures.one.module import Class as Class1
         from tests.fixtures.one.module import function as func1
         from tests.fixtures.one.module import inst as inst1
-        from tests.fixtures.one.module import Class as Class1
 
         self.assertEqual(test.registrations[0]["name"], "Class")
         self.assertEqual(test.registrations[0]["ob"], Class1)
@@ -512,9 +511,9 @@ class TestScanner(unittest.TestCase):
         scanner = self._makeOne(test=test)
         scanner.scan(one, ignore=[".module2"])
         self.assertEqual(len(test.registrations), 3)
+        from tests.fixtures.one.module import Class as Class1
         from tests.fixtures.one.module import function as func1
         from tests.fixtures.one.module import inst as inst1
-        from tests.fixtures.one.module import Class as Class1
 
         self.assertEqual(test.registrations[0]["name"], "Class")
         self.assertEqual(test.registrations[0]["ob"], Class1)
@@ -639,9 +638,9 @@ class TestScanner(unittest.TestCase):
         scanner = self._makeOne(test=test)
         scanner.scan(one, ignore="tests.fixtures.one.module2")
         self.assertEqual(len(test.registrations), 3)
+        from tests.fixtures.one.module import Class as Class1
         from tests.fixtures.one.module import function as func1
         from tests.fixtures.one.module import inst as inst1
-        from tests.fixtures.one.module import Class as Class1
 
         self.assertEqual(test.registrations[0]["name"], "Class")
         self.assertEqual(test.registrations[0]["ob"], Class1)
@@ -657,6 +656,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_mixed_string_and_func(self):
         import re
+
         from tests.fixtures import one
 
         test = _Test()
@@ -665,8 +665,8 @@ class TestScanner(unittest.TestCase):
             one, ignore=["tests.fixtures.one.module2", re.compile("inst").search]
         )
         self.assertEqual(len(test.registrations), 2)
-        from tests.fixtures.one.module import function as func1
         from tests.fixtures.one.module import Class as Class1
+        from tests.fixtures.one.module import function as func1
 
         self.assertEqual(test.registrations[0]["name"], "Class")
         self.assertEqual(test.registrations[0]["ob"], Class1)
@@ -678,6 +678,7 @@ class TestScanner(unittest.TestCase):
 
     def test_ignore_mixed_string_abs_rel_and_func(self):
         import re
+
         from tests.fixtures import one
 
         test = _Test()

@@ -1,5 +1,4 @@
 from tests.fixtures import decorator
-
 from tests.fixtures.importonly.two import twofunction  # should not be scanned
 
 

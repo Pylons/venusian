@@ -27,8 +27,9 @@ Visit the PEAK home page at http://peak.telecommunity.com for more information.
 $Id: test_advice.py 40836 2005-12-16 22:40:51Z benji_york $
 """
 
-import unittest
 import sys
+import unittest
+
 from venusian import advice
 
 PY3 = sys.version_info[0] >= 3
