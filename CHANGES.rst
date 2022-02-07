@@ -1,5 +1,7 @@
-3.0.1 unreleased
-----------------
+unreleased
+----------
+
+- Remove support for Python 3.5 and 3.6
 
 - Add support for Python 3.9 and 3.10.
 
