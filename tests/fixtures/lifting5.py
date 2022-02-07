@@ -1,5 +1,5 @@
-from venusian import lift
 from tests.fixtures import decorator
+from venusian import lift
 
 
 class Super1(object):  # pragma: no cover

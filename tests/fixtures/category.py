@@ -1,5 +1,4 @@
-from tests.fixtures import categorydecorator
-from tests.fixtures import categorydecorator2
+from tests.fixtures import categorydecorator, categorydecorator2
 
 
 @categorydecorator(function=True)

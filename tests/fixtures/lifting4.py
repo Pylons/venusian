@@ -1,8 +1,5 @@
+from tests.fixtures import categorydecorator, categorydecorator2
 from venusian import lift, onlyliftedfrom
-from tests.fixtures import (
-    categorydecorator,
-    categorydecorator2,
-)
 
 
 @onlyliftedfrom()

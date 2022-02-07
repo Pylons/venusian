@@ -1,6 +1,6 @@
+import sys
 from inspect import getmembers, getmro, isclass
 from pkgutil import iter_modules
-import sys
 
 from venusian.advice import getFrameInfo
 

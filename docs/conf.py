@@ -14,9 +14,9 @@
 # import sys
 # sys.path.insert(0, os.path.abspath("."))
 import datetime
+
 import pkg_resources
 import pylons_sphinx_themes
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -62,13 +62,15 @@ html_theme_options = dict(
 # html_static_path = ['_static']
 
 # Control display of sidebars
-html_sidebars = { "**": [
-    "localtoc.html",
-    "ethicalads.html",
-    "relations.html",
-    "sourcelink.html",
-    "searchbox.html",
-] }
+html_sidebars = {
+    "**": [
+        "localtoc.html",
+        "ethicalads.html",
+        "relations.html",
+        "sourcelink.html",
+        "searchbox.html",
+    ]
+}
 
 # If not "", a "Last updated on:" timestamp is inserted at every page
 # bottom, using the given strftime format.
