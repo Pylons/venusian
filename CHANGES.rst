@@ -1,3 +1,11 @@
+3.0.1 unreleased
+----------------
+
+- Add support for Python 3.9 and 3.10.
+
+- Use GitHub Actions instead of Travis.
+
+
 3.0.0 (2019-10-04)
 ------------------
 

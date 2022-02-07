@@ -1,8 +1,7 @@
 graft src/venusian
 graft tests
 graft docs
-prune docs/_build
-prune docs/_themes
+graft .github
 
 include README.rst
 include CHANGES.rst
@@ -13,6 +12,7 @@ include COPYRIGHT.txt
 
 include pyproject.toml setup.cfg
 include .coveragerc
-include tox.ini .travis.yml rtd.txt
+include tox.ini rtd.txt
+include .readthedocs.yaml
 
 recursive-exclude * __pycache__ *.py[cod]
