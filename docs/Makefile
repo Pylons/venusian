@@ -1,11 +1,12 @@
 # Makefile for Sphinx documentation
 #
 
-# You can set these variables from the command line.
-SPHINXOPTS    = -W
-SPHINXBUILD   = sphinx-build
-PAPER         =
-BUILDDIR      = _build
+# You can set these variables from the command line, and also
+# from the environment for the first two.
+SPHINXOPTS    ?= -W
+SPHINXBUILD   ?= sphinx-build
+SOURCEDIR     = source
+BUILDDIR      = build
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -84,3 +85,4 @@ epub:
 	$(SPHINXBUILD) -b epub $(ALLSPHINXOPTS) $(BUILDDIR)/epub
 	@echo
 	@echo "Build finished. The epub file is in $(BUILDDIR)/epub."
+
