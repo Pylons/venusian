@@ -7,6 +7,7 @@ on:
             - master
             - "[0-9].[0-9]+-branch"
         tags:
+            - '**'
     # Build pull requests
     pull_request:
 
@@ -59,7 +60,6 @@ jobs:
               with:
                   python-version: 3.9
                   architecture: x64
-
             - run: pip install tox
             - run: tox -e py38,coverage
     docs:
