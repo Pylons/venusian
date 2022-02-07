@@ -3,10 +3,18 @@ requires = ["setuptools >= 40.9.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
-py36 = false
+target-version = ['py37', 'py38', 'py39', 'py310']
 exclude = '''
 /(
   \.git
   | .tox
+  | build
 )/
 '''
+
+ # This next section only exists for people that have their editors
+# automatically call isort, black already sorts entries on its own when run.
+[tool.isort]
+profile = "black"
+src_paths = ["src", "tests"]
+known_first_party = "venusian"
