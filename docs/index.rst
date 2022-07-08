@@ -173,7 +173,7 @@ demonstrated below.
 
    def jsonify(wrapped):
        def callback(scanner, name, ob):
-           print 'jsonified'
+           print('jsonified')
        venusian.attach(wrapped, callback)
        return wrapped
 
@@ -200,7 +200,7 @@ doesn't actually change its behavior.
    :linenos:
 
    >>> from theapp import logged_in
-   >>> logged_in()
+   >>> logged_in(None)
    {'result':'Logged in'}
    >>>
 
