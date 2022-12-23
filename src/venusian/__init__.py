@@ -3,6 +3,7 @@ from inspect import getmembers, getmro, isclass
 from pkgutil import iter_modules
 
 from venusian.advice import getFrameInfo
+from venusian.compat import compat_find_loader
 
 ATTACH_ATTR = "__venusian_callbacks__"
 LIFTONLY_ATTR = "__venusian_liftonly_callbacks__"
@@ -202,7 +203,7 @@ class Scanner(object):
             )
 
             for importer, modname, ispkg in results:
-                loader = importer.find_module(modname)
+                loader = compat_find_loader(importer, modname)
                 if loader is not None:  # happens on pypy with orphaned pyc
                     try:
                         get_filename = getattr(loader, "get_filename", None)
