@@ -4,7 +4,7 @@ on:
     # Only on pushes to master or one of the release branches we build on push
     push:
         branches:
-            - master
+            - main
             - "[0-9].[0-9]+-branch"
         tags:
             - '**'
