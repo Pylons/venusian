@@ -305,6 +305,7 @@ class TestScanner(unittest.TestCase):
 
         test = _Test()
         scanner = self._makeOne(test=test)
+
         # with this custom onerror, scan will not propagate the importerror
         # from will_raise_importerror
         def onerror(name):
@@ -325,6 +326,7 @@ class TestScanner(unittest.TestCase):
         md("tests.fixtures.importerror_package.will_cause_import_error")
         test = _Test()
         scanner = self._makeOne(test=test)
+
         # with this custom onerror, scan will not propagate the importerror
         # from will_raise_importerror
         def onerror(name):
@@ -345,6 +347,7 @@ class TestScanner(unittest.TestCase):
 
         test = _Test()
         scanner = self._makeOne(test=test)
+
         # with this custom onerror, scan will not propagate the importerror
         # from will_raise_importerror
         def onerror(name):
@@ -365,6 +368,7 @@ class TestScanner(unittest.TestCase):
         md("tests.fixtures.attrerror_package.will_cause_import_error")
         test = _Test()
         scanner = self._makeOne(test=test)
+
         # with this custom onerror, scan will not propagate the importerror
         # from will_raise_importerror
         def onerror(name):

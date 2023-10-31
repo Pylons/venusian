@@ -48,7 +48,6 @@ moduleLevelFrameInfo = advice.getFrameInfo(sys._getframe())
 
 
 class FrameInfoTest(unittest.TestCase):
-
     classLevelFrameInfo = advice.getFrameInfo(sys._getframe())
 
     def testModuleInfo(self):

@@ -134,7 +134,6 @@ class Scanner(object):
             return False
 
         def invoke(mod_name, name, ob):
-
             fullname = mod_name + "." + name
 
             if _ignore(fullname):
@@ -387,7 +386,6 @@ def walk_packages(path=None, prefix="", onerror=None, ignore=None):
 
     # iter_modules is nonrecursive
     for importer, name, ispkg in iter_modules(path, prefix):
-
         if ignore is not None and ignore(name):
             # if name is a package, ignoring here will cause
             # all subpackages and submodules to be ignored too
