@@ -3,7 +3,7 @@ unreleased
 
 - Remove support for Python 3.5 and 3.6
 
-- Add support for Python 3.9 and 3.10.
+- Add support for Python 3.9, 3.10, 3.11 and 3.12.
 
 - Use GitHub Actions instead of Travis.
 
