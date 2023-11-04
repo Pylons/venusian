@@ -1,18 +1,18 @@
 graft src/venusian
-graft tests
 graft docs
-graft .github
+prune docs/_build
+graft tests
 
 include README.rst
 include CHANGES.rst
-include LICENSE.txt
 include CONTRIBUTING.rst
 include CONTRIBUTORS.txt
+include LICENSE.txt
 include COPYRIGHT.txt
 
-include pyproject.toml setup.cfg
-include .coveragerc
-include tox.ini rtd.txt
-include .readthedocs.yaml
+include .coveragerc pyproject.toml setup.cfg
+include tox.ini .readthedocs.yaml
+graft .github
 
-recursive-exclude * __pycache__ *.py[cod]
+global-exclude __pycache__ *.py[cod]
+global-exclude .DS_Store
