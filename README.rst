@@ -10,8 +10,8 @@ venusian
 
 Venusian is a library which allows framework authors to defer
 decorator actions.  Instead of taking actions when a function (or
-class) decorator is executed at import time, you can defer the action
-usually taken by the decorator until a separate "scan" phase.
+class) decorator is executed at import time, venusion-based decorators
+can defer the action usually taken until a separate "scan" phase.
 
 See the "docs" directory of the package or the online documentation at
 https://docs.pylonsproject.org/projects/venusian/en/latest/
