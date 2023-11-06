@@ -1,12 +1,11 @@
-unreleased
-----------
+3.1.0 (2023-11-06)
+------------------
 
 - Remove support for Python 3.5 and 3.6
 
 - Add support for Python 3.9, 3.10, 3.11 and 3.12.
 
 - Use GitHub Actions instead of Travis.
-
 
 3.0.0 (2019-10-04)
 ------------------
