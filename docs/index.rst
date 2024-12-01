@@ -140,7 +140,7 @@ chance to grab a reference to his original function:
    :linenos:
 
     from myapp import logged_in
-    result = logged_in.original_func(None)
+    result = logged_in.original_function(None)
     self.assertEqual(result['result'], 'Logged in')
 
 That works.  But it's just a little weird.  Since the ``jsonify``
