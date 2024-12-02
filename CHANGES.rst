@@ -1,3 +1,10 @@
+Unreleased
+----------
+
+- Add support for Python 3.13 (thanks to musicinmybrain).
+
+- Fix GitHub test actions.
+
 3.1.0 (2023-11-06)
 ------------------
 
