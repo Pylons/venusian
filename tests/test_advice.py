@@ -93,7 +93,9 @@ class FrameInfoTest(unittest.TestCase):
             sys._getframe()
         )
         self.assertEqual(kind, "function call")
-        self.assertTrue(f_locals is locals())  # ???
+        frame = sys._getframe()
+        self.assertEqual(f_locals, frame.f_locals)
+        self.assertEqual(f_locals, locals())
         for d in module.__dict__, f_globals:
             self.assertTrue(d is globals())
         self.assertEqual(len(codeinfo), 4)
