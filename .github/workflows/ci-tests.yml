@@ -27,7 +27,7 @@ jobs:
                 os:
                     - "ubuntu-latest"
                     - "windows-latest"
-                    - "macos-14" # sonoma (later seem to fail building python)
+                    - "macos-12" # (later seem to fail building python)
                 architecture:
                     - x64
                     - x86
@@ -36,7 +36,7 @@ jobs:
                     # Linux and macOS don't have x86 python
                     - os: "ubuntu-latest"
                       architecture: x86
-                    - os: "macos-14"
+                    - os: "macos-12"
                       architecture: x86
                     # python 3.7 and 3.8 no longer build on recent MacOS
                     #- os: "macos-14"
