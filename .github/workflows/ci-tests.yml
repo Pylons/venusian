@@ -27,7 +27,7 @@ jobs:
                 os:
                     - "ubuntu-latest"
                     - "windows-latest"
-                    - "macos-latest"
+                    - "macos-sonoma"
                 architecture:
                     - x64
                     - x86
