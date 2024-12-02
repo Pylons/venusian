@@ -38,6 +38,9 @@ jobs:
                       architecture: x86
                     - os: "macos-latest"
                       architecture: x86
+                    # python 3.7 no longer builds on recent MacOS
+                    - os: "macos-latest"
+                      py: "3.7"
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
