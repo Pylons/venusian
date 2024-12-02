@@ -1,5 +1,5 @@
-Unreleased
-----------
+3.1.1 (2024-12-01)
+------------------
 
 - Add support for Python 3.13 (thanks to musicinmybrain).
 
