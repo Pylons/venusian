@@ -1,4 +1,4 @@
-3.3.0 (unreleased)
+3.2.0 (unreleased)
 ------------------
 
 - Remove support for Python 3.7 and 3.8.
