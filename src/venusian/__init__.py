@@ -175,17 +175,18 @@ class Scanner(object):
                     return
             for category in category_keys:
                 callbacks = attached_categories.get(category, [])
-                try:
-                    # Metaclasses might trick us by reaching this far and then
-                    # fail with too little values to unpack.
-                    for callback, cb_mod_name, liftid, scope in callbacks:
-                        if cb_mod_name != mod_name:
-                            # avoid processing objects that were imported into
-                            # this module but were not actually defined there
-                            continue
-                        callback(self, name, ob)
-                except ValueError:  # pragma: nocover
-                    continue
+                for cb_tuple in callbacks:
+                    try:
+                        # Metaclasses might trick us by reaching this far and then
+                        # fail with too little values to unpack.
+                        callback, cb_mod_name, liftid, scope = cb_tuple
+                    except ValueError:  # pragma: nocover
+                        continue
+                    if cb_mod_name != mod_name:
+                        # avoid processing objects that were imported into
+                        # this module but were not actually defined there
+                        continue
+                    callback(self, name, ob)
 
         for name, ob in getmembers(package):
             # whether it's a module or a package, we need to scan its
