@@ -9,6 +9,7 @@ exclude = '''
   \.git
   | .tox
   | build
+  | env
 )/
 '''
 
@@ -17,4 +18,5 @@ exclude = '''
 [tool.isort]
 profile = "black"
 src_paths = ["src", "tests"]
+skip_glob = "env/*"
 known_first_party = "venusian"
