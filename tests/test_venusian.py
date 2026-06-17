@@ -426,6 +426,15 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(test.registrations[0]["ob"], func1)
         self.assertEqual(test.registrations[0]["function"], True)
 
+    def test_valueerror_during_scan_in_callback(self):
+        from tests.fixtures import callback_valueerror
+
+        test = _Test()
+        scanner = self._makeOne(test=test)
+        # without a custom onerror, scan will propagate the importerror from
+        # will_cause_import_error
+        self.assertRaises(ValueError, scanner.scan, callback_valueerror)
+
     def test_ignore_by_full_dotted_name(self):
         from tests.fixtures import one
 
