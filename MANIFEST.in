@@ -10,7 +10,7 @@ include CONTRIBUTORS.txt
 include LICENSE.txt
 include COPYRIGHT.txt
 
-include .coveragerc pyproject.toml setup.cfg
+include .coveragerc .mailmap pyproject.toml setup.cfg
 include tox.ini .readthedocs.yaml
 graft .github
 
